@@ -136,82 +136,67 @@ def _execute_function(name: str, args: dict, db: Session) -> Any:
 
 async def handle_chat(message: str, db: Session) -> ChatResponse:
     """
-    Processa uma mensagem de linguagem natural usando Gemini function calling.
-    Retorna resposta formatada + dados brutos quando aplicável.
+    Processa uma mensagem de linguagem natural usando Gemini Chat session.
+    A sessão gerencia o histórico e as signatures (como thought_signature) automaticamente.
     """
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY não configurada.")
 
     client = genai.Client(api_key=api_key)
-
-    contents = [types.Content(role="user", parts=[types.Part(text=message)])]
-
-    # --- Turno 1: Gemini decide qual function chamar ---
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=contents,
+    chat = client.chats.create(
+        model="gemini-2.5-flash",
         config=types.GenerateContentConfig(
             system_instruction=SYSTEM_INSTRUCTION,
             tools=TOOLS,
             temperature=0.2,
+            thinking_config=types.ThinkingConfig(include_thoughts=False),
         ),
     )
 
-    candidate = response.candidates[0]
     action_taken = None
     raw_data = None
 
-    # Verifica se o Gemini quer chamar uma função
-    function_calls = [
-        part.function_call
-        for part in candidate.content.parts
-        if part.function_call is not None
-    ]
-
-    if function_calls:
-        fc = function_calls[0]
+    # --- Turno 1: Envia mensagem e recebe instrução (possível function call) ---
+    response = chat.send_message(message)
+    
+    # Processa possíveis function calls loop
+    while True:
+        # Pega a primeira function call encontrada em qualquer parte da resposta
+        fc = next((p.function_call for p in response.candidates[0].content.parts if p.function_call), None)
+        if not fc:
+            break
+            
         action_taken = fc.name
-        func_args = dict(fc.args) if fc.args else {}
-
-        # Executa a query
-        result = _execute_function(fc.name, func_args, db)
-        raw_data = result if isinstance(result, list) else (
-            result.get("items") if isinstance(result, dict) else None
-        )
-
-        # --- Turno 2: Re-envia resultado para o Gemini formatar ---
-        contents.append(candidate.content)
-        contents.append(
-            types.Content(
-                role="user",
-                parts=[
-                    types.Part(
-                        function_response=types.FunctionResponse(
-                            name=fc.name,
-                            response={"result": result},
-                        )
-                    )
-                ],
+        
+        # Executa a função
+        result = _execute_function(fc.name, fc.args, db)
+        
+        # Salva dados brutos se for a primeira/principal chamada
+        if raw_data is None:
+            if isinstance(result, list) and result:
+                # Se for lista de strings (list_areas), converte para list[dict]
+                if isinstance(result[0], str):
+                    raw_data = [{"area": a} for a in result]
+                else:
+                    # lista de dicts (get_distribuicao)
+                    raw_data = result
+            elif isinstance(result, dict):
+                # search_periodicos retorna {"items": [...], "total": N}
+                raw_data = result.get("items")
+            
+        # --- Turno 2+: Envia resultado da função de volta para o Chat ---
+        response = chat.send_message(
+            types.Part(
+                function_response=types.FunctionResponse(
+                    name=fc.name,
+                    response={"result": result},
+                )
             )
         )
 
-        final_response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=contents,
-            config=types.GenerateContentConfig(
-                system_instruction=SYSTEM_INSTRUCTION,
-                tools=TOOLS,
-                temperature=0.2,
-            ),
-        )
-        text_response = final_response.text or "Não foi possível formatar a resposta."
-    else:
-        # Gemini respondeu diretamente (sem function call)
-        text_response = response.text or "Não entendi sua pergunta. Tente reformular."
-
     return ChatResponse(
-        response=text_response,
+        response=response.text or "Não foi possível formatar a resposta.",
         data=raw_data,
         action_taken=action_taken,
     )
