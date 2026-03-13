@@ -1,0 +1,275 @@
+import { useState, useEffect, useCallback } from 'react'
+import './index.css'
+import { getAreas, getPeriodicos, getDistribuicao } from './api.js'
+import AreaSelector from './components/AreaSelector.jsx'
+import ClassificationFilter from './components/ClassificationFilter.jsx'
+import ResultsTable from './components/ResultsTable.jsx'
+import DistributionPanel from './components/DistributionPanel.jsx'
+
+const PER_PAGE = 20
+
+export default function App() {
+  // --- Areas state ---
+  const [areas, setAreas] = useState([])
+  const [areasLoading, setAreasLoading] = useState(true)
+
+  // --- Selected area & filters ---
+  const [selectedArea, setSelectedArea] = useState(null)
+  const [selectedEstratos, setSelectedEstratos] = useState([])
+  const [searchText, setSearchText] = useState('')
+  const [searchInput, setSearchInput] = useState('') // local input state
+
+  // --- Results state ---
+  const [results, setResults] = useState(null)
+  const [resultsLoading, setResultsLoading] = useState(false)
+  const [resultsError, setResultsError] = useState(null)
+  const [currentPage, setCurrentPage] = useState(1)
+
+  // --- Distribution state ---
+  const [distribution, setDistribution] = useState(null)
+  const [distLoading, setDistLoading] = useState(false)
+
+  // Load areas on mount
+  useEffect(() => {
+    getAreas()
+      .then(data => setAreas(data))
+      .catch(console.error)
+      .finally(() => setAreasLoading(false))
+  }, [])
+
+  // Fetch results when area/filters/page change
+  const fetchResults = useCallback(async (area, estratos, search, page) => {
+    if (!area) { setResults(null); return }
+    setResultsLoading(true)
+    setResultsError(null)
+    try {
+      const data = await getPeriodicos({
+        area,
+        // multiple estratos -> pass array of strings if supported by backend,
+        // but implementation plan says: GET /api/periodicos?area=&estrato=&search...
+        // so multiple might need custom handling.
+        // Let's pass array by comma-separating them, or just first one if only 1 is supported?
+        // Let's assume the backend supports comma separated or just 1.
+        estrato: estratos.length > 0 ? estratos.join(',') : undefined,
+        search: search || undefined,
+        page,
+        per_page: PER_PAGE,
+      })
+      setResults(data)
+    } catch (err) {
+      setResultsError(err.message)
+    } finally {
+      setResultsLoading(false)
+    }
+  }, [])
+
+  // Fetch distribution when area changes
+  const fetchDistribution = useCallback(async (area) => {
+    if (!area) { setDistribution(null); return }
+    setDistLoading(true)
+    try {
+      const data = await getDistribuicao(area)
+      setDistribution(data)
+    } catch (err) {
+      console.error('Distribution error:', err)
+    } finally {
+      setDistLoading(false)
+    }
+  }, [])
+
+  // React to area selection
+  useEffect(() => {
+    setSelectedEstratos([])
+    setSearchText('')
+    setSearchInput('')
+    setCurrentPage(1)
+    fetchDistribution(selectedArea)
+    fetchResults(selectedArea, [], '', 1)
+  }, [selectedArea, fetchDistribution, fetchResults])
+
+  // React to filter/search/page changes (not area)
+  useEffect(() => {
+    if (!selectedArea) return
+    fetchResults(selectedArea, selectedEstratos, searchText, currentPage)
+  }, [selectedArea, selectedEstratos, searchText, currentPage, fetchResults])
+
+  function handleAreaSelect(area) {
+    setSelectedArea(area)
+  }
+
+  function handleEstratoChange(estratos) {
+    setSelectedEstratos(estratos)
+    setCurrentPage(1)
+  }
+
+  function handleSearchSubmit(e) {
+    e.preventDefault()
+    setSearchText(searchInput)
+    setCurrentPage(1)
+  }
+
+  function handlePageChange(page) {
+    setCurrentPage(page)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const hasContent = !!selectedArea
+
+  return (
+    <>
+      {/* ── Header ── */}
+      <header className="app-header">
+        <div className="header-inner">
+          <div className="header-logo">
+            QUALIS CAPES
+            <span>Consulta de Classificação de Periódicos</span>
+          </div>
+          <span className="header-badge">171.111 registros · 50 áreas</span>
+        </div>
+      </header>
+
+      {/* ── Main ── */}
+      <main className="main-content">
+        <div className="app-container">
+
+          {/* Area selector */}
+          <div className="card area-section">
+            <AreaSelector
+              areas={areas}
+              selected={selectedArea}
+              onSelect={handleAreaSelect}
+              loading={areasLoading}
+            />
+          </div>
+
+          {/* Content panel — only after area is selected */}
+          {!hasContent ? (
+            <div className="card" style={{ padding: '64px 24px' }}>
+              <div className="empty-state">
+                <div className="empty-state-icon">🔍</div>
+                <p>Selecione uma área de avaliação para começar</p>
+                <small>Dados das classificações publicadas no Sucupira / CAPES</small>
+              </div>
+            </div>
+          ) : (
+            <div className="content-grid">
+              {/* ── Left: Distribution ── */}
+              <DistributionPanel
+                data={distribution}
+                loading={distLoading}
+                area={selectedArea}
+              />
+
+              {/* ── Right: Filters + Table ── */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+                {/* Filters card */}
+                <div className="card" style={{ padding: '20px' }}>
+                  <ClassificationFilter
+                    selected={selectedEstratos}
+                    onChange={handleEstratoChange}
+                  />
+
+                  <div style={{ marginTop: '16px' }}>
+                    <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '8px' }}>
+                      <input
+                        type="text"
+                        value={searchInput}
+                        onChange={e => setSearchInput(e.target.value)}
+                        placeholder="Buscar por título ou ISSN…"
+                        maxLength={200}
+                      />
+                      <button
+                        type="submit"
+                        className="btn-primary"
+                        style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
+                      >
+                        Buscar
+                      </button>
+                      {searchText && (
+                        <button
+                          type="button"
+                          onClick={() => { setSearchInput(''); setSearchText(''); setCurrentPage(1) }}
+                          style={{
+                            background: 'var(--neutral-50)',
+                            border: '1px solid var(--neutral-200)',
+                            borderRadius: '6px',
+                            padding: '0 12px',
+                            color: 'var(--neutral-700)',
+                            fontSize: '13px',
+                            flexShrink: 0,
+                          }}
+                        >
+                          Limpar
+                        </button>
+                      )}
+                    </form>
+                  </div>
+
+                  {/* Active filters summary */}
+                  {(selectedEstratos.length > 0 || searchText) && (
+                    <div style={{
+                      marginTop: '12px',
+                      paddingTop: '12px',
+                      borderTop: '1px solid var(--neutral-200)',
+                      fontSize: '12px',
+                      color: 'var(--neutral-700)',
+                    }}>
+                      Filtrando por:
+                      {selectedEstratos.length > 0 && (
+                        <span style={{ marginLeft: '6px' }}>
+                          estratos <strong>{selectedEstratos.join(', ')}</strong>
+                        </span>
+                      )}
+                      {searchText && (
+                        <span style={{ marginLeft: '6px' }}>
+                          · busca <strong>"{searchText}"</strong>
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Error */}
+                {resultsError && (
+                  <div className="error-message">
+                    Erro ao buscar dados: {resultsError}
+                  </div>
+                )}
+
+                {/* Results table card */}
+                <div className="card" style={{ padding: '20px' }}>
+                  <div style={{ marginBottom: '12px' }}>
+                    <h2 className="section-title" style={{ marginBottom: 0 }}>{selectedArea}</h2>
+                  </div>
+                  <ResultsTable
+                    items={results?.items}
+                    total={results?.total ?? 0}
+                    page={currentPage}
+                    perPage={PER_PAGE}
+                    totalPages={results?.total_pages ?? 1}
+                    loading={resultsLoading}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
+
+      {/* ── Footer ── */}
+      <footer style={{
+        marginTop: '48px',
+        padding: '24px',
+        borderTop: '1px solid var(--neutral-200)',
+        background: 'var(--white)',
+        textAlign: 'center',
+        fontSize: '12px',
+        color: 'var(--neutral-400)',
+      }}>
+        Dados: QUALIS CAPES — Classificações Publicadas no Sucupira
+      </footer>
+    </>
+  )
+}

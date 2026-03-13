@@ -1,0 +1,287 @@
+/* ===========================
+   QUALIS CAPES — Design System
+   =========================== */
+
+/* --- CSS Variables --- */
+:root {
+  /* Primary — Azul Institucional */
+  --primary-900: #0D1B3E;
+  --primary-700: #1A3A6B;
+  --primary-500: #2E5EA1;
+  --primary-100: #E8EEF6;
+  --primary-50:  #F4F7FB;
+
+  /* Neutral */
+  --neutral-900: #1F2937;
+  --neutral-700: #374151;
+  --neutral-400: #9CA3AF;
+  --neutral-200: #E5E7EB;
+  --neutral-50:  #F9FAFB;
+  --white:       #FFFFFF;
+
+  /* Estratos */
+  --estrato-a1-text: #166534; --estrato-a1-bg: #DCFCE7;
+  --estrato-a2-text: #15803D; --estrato-a2-bg: #DCFCE7;
+  --estrato-a3-text: #3B82F6; --estrato-a3-bg: #DBEAFE;
+  --estrato-a4-text: #6366F1; --estrato-a4-bg: #E0E7FF;
+  --estrato-b1-text: #CA8A04; --estrato-b1-bg: #FEF9C3;
+  --estrato-b2-text: #D97706; --estrato-b2-bg: #FEF3C7;
+  --estrato-b3-text: #EA580C; --estrato-b3-bg: #FFEDD5;
+  --estrato-b4-text: #DC2626; --estrato-b4-bg: #FEE2E2;
+  --estrato-c-text:  #6B7280; --estrato-c-bg:  #F3F4F6;
+
+  /* Accent */
+  --accent:  #059669;
+  --danger:  #DC2626;
+  --warning: #D97706;
+
+  /* Spacing base: 4px */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-12: 48px;
+
+  /* Typography */
+  --font-serif: 'Merriweather', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+/* --- Reset --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--neutral-900);
+  background-color: var(--primary-50);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* --- Layout --- */
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--sp-4);
+}
+
+/* --- Header --- */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--white);
+  border-bottom: 1px solid var(--neutral-200);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--sp-4);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+}
+
+.header-logo {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary-900);
+  line-height: 1.2;
+}
+
+.header-logo span {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--neutral-700);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.header-badge {
+  margin-left: auto;
+  background: var(--primary-100);
+  color: var(--primary-700);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+/* --- Cards --- */
+.card {
+  background: var(--white);
+  border: 1px solid var(--neutral-200);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+/* --- Section Titles --- */
+.section-title {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--neutral-900);
+  margin-bottom: var(--sp-4);
+}
+
+.section-subtitle {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--neutral-700);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--sp-3);
+}
+
+/* --- Buttons --- */
+button {
+  font-family: var(--font-sans);
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+.btn-primary {
+  background: var(--primary-700);
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 600;
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: 6px;
+  transition: background 0.15s ease;
+}
+.btn-primary:hover { background: var(--primary-500); }
+
+/* --- Inputs --- */
+input, select {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--neutral-900);
+  background: var(--white);
+  border: 1px solid var(--neutral-400);
+  border-radius: 6px;
+  padding: var(--sp-2) var(--sp-3);
+  width: 100%;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  outline: none;
+}
+input:focus, select:focus {
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-100);
+}
+input::placeholder {
+  color: var(--neutral-400);
+}
+
+/* --- Estrato Badges --- */
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.badge-A1 { color: var(--estrato-a1-text); background: var(--estrato-a1-bg); }
+.badge-A2 { color: var(--estrato-a2-text); background: var(--estrato-a2-bg); }
+.badge-A3 { color: var(--estrato-a3-text); background: var(--estrato-a3-bg); }
+.badge-A4 { color: var(--estrato-a4-text); background: var(--estrato-a4-bg); }
+.badge-B1 { color: var(--estrato-b1-text); background: var(--estrato-b1-bg); }
+.badge-B2 { color: var(--estrato-b2-text); background: var(--estrato-b2-bg); }
+.badge-B3 { color: var(--estrato-b3-text); background: var(--estrato-b3-bg); }
+.badge-B4 { color: var(--estrato-b4-text); background: var(--estrato-b4-bg); }
+.badge-C  { color: var(--estrato-c-text);  background: var(--estrato-c-bg); }
+
+/* --- Main content layout --- */
+.main-content {
+  padding: var(--sp-6) 0;
+}
+
+.area-section {
+  margin-bottom: var(--sp-6);
+  padding: var(--sp-6);
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: var(--sp-4);
+  align-items: start;
+}
+
+/* --- Empty state --- */
+.empty-state {
+  text-align: center;
+  padding: var(--sp-12);
+  color: var(--neutral-400);
+}
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: var(--sp-4);
+  opacity: 0.5;
+}
+.empty-state p {
+  font-size: 15px;
+  color: var(--neutral-700);
+  margin-bottom: var(--sp-2);
+}
+.empty-state small {
+  font-size: 13px;
+  color: var(--neutral-400);
+}
+
+/* --- Loading state --- */
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-12);
+  color: var(--neutral-700);
+  gap: var(--sp-3);
+}
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--neutral-200);
+  border-top-color: var(--primary-500);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* --- Error state --- */
+.error-message {
+  background: #FEE2E2;
+  color: var(--danger);
+  border: 1px solid #FECACA;
+  border-radius: 6px;
+  padding: var(--sp-3) var(--sp-4);
+  font-size: 13px;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+  .header-badge { display: none; }
+}
