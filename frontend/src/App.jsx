@@ -5,6 +5,7 @@ import AreaSelector from './components/AreaSelector.jsx'
 import ClassificationFilter from './components/ClassificationFilter.jsx'
 import ResultsTable from './components/ResultsTable.jsx'
 import DistributionPanel from './components/DistributionPanel.jsx'
+import ChatPanel from './components/ChatPanel.jsx'
 
 const PER_PAGE = 20
 
@@ -69,7 +70,8 @@ export default function App() {
     setDistLoading(true)
     try {
       const data = await getDistribuicao(area)
-      setDistribution(data)
+      // The API returns { area, total, distribuicao: [...] } — we only need the array
+      setDistribution(data.distribuicao ?? data)
     } catch (err) {
       console.error('Distribution error:', err)
     } finally {
@@ -77,7 +79,7 @@ export default function App() {
     }
   }, [])
 
-  // React to area selection
+  // React to area selection — resets all filters and fetches fresh data
   useEffect(() => {
     setSelectedEstratos([])
     setSearchText('')
@@ -87,11 +89,8 @@ export default function App() {
     fetchResults(selectedArea, [], '', 1)
   }, [selectedArea, fetchDistribution, fetchResults])
 
-  // React to filter/search/page changes (not area)
-  useEffect(() => {
-    if (!selectedArea) return
-    fetchResults(selectedArea, selectedEstratos, searchText, currentPage)
-  }, [selectedArea, selectedEstratos, searchText, currentPage, fetchResults])
+  // NOTE: filter/page changes are handled directly in the event handlers below
+  // (no second useEffect) to avoid double-firing when area changes.
 
   function handleAreaSelect(area) {
     setSelectedArea(area)
@@ -100,16 +99,19 @@ export default function App() {
   function handleEstratoChange(estratos) {
     setSelectedEstratos(estratos)
     setCurrentPage(1)
+    fetchResults(selectedArea, estratos, searchText, 1)
   }
 
   function handleSearchSubmit(e) {
     e.preventDefault()
     setSearchText(searchInput)
     setCurrentPage(1)
+    fetchResults(selectedArea, selectedEstratos, searchInput, 1)
   }
 
   function handlePageChange(page) {
     setCurrentPage(page)
+    fetchResults(selectedArea, selectedEstratos, searchText, page)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -270,6 +272,9 @@ export default function App() {
       }}>
         Dados: QUALIS CAPES — Classificações Publicadas no Sucupira
       </footer>
+
+      {/* ── Chatbot ── */}
+      <ChatPanel />
     </>
   )
 }
