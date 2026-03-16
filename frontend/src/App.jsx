@@ -265,16 +265,9 @@ export default function App() {
       </main>
 
       {/* ── Footer ── */}
-      <footer style={{
-        marginTop: '48px',
-        padding: '24px',
-        borderTop: '1px solid var(--neutral-200)',
-        background: 'var(--white)',
-        textAlign: 'center',
-        fontSize: '12px',
-        color: 'var(--neutral-400)',
-      }}>
-        Dados: QUALIS CAPES — Classificações Publicadas no Sucupira
+      <footer className="app-footer">
+        <p>Dados: QUALIS CAPES — Classificações Publicadas no Sucupira</p>
+        <p>Desenvolvido por <strong>Ronan Junior</strong></p>
       </footer>
 
       {/* ── Chatbot ── */}

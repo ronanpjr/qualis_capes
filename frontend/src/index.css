@@ -477,4 +477,34 @@ input::placeholder {
     padding: var(--sp-3);
   }
 }
+/* ── Footer ── */
+.app-footer {
+  margin-top: 64px;
+  padding: 32px 24px;
+  border-top: 1px solid var(--neutral-200);
+  background: var(--white);
+  text-align: center;
+  font-size: 13px;
+  color: var(--neutral-500);
+  transition: all 0.3s ease;
+}
+
+.app-footer p {
+  margin: 4px 0;
+}
+
+.app-footer strong {
+  color: var(--primary-600);
+  font-weight: 600;
+}
+
+.dark .app-footer {
+  background: var(--neutral-900);
+  border-top-color: var(--neutral-800);
+  color: var(--neutral-400);
+}
+
+.dark .app-footer strong {
+  color: var(--primary-400);
+}
 
