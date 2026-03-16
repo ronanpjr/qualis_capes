@@ -16,7 +16,7 @@ const ESTRATO_COLORS = {
   C:  'var(--estrato-c-chart)',
 }
 
-export default function DistributionPanel({ data, loading, area }) {
+export default function DistributionPanel({ data, loading }) {
   const { chartData, total } = useMemo(() => {
     if (!data || data.length === 0) return { chartData: [], total: 0 }
 

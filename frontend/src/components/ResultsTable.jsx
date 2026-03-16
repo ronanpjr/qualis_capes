@@ -1,4 +1,4 @@
-export default function ResultsTable({ items, total, page, perPage, totalPages, loading, onPageChange }) {
+export default function ResultsTable({ items, total, page, totalPages, loading, onPageChange }) {
   if (loading) {
     return (
       <div className="animate-in">

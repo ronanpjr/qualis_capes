@@ -163,7 +163,6 @@ export default function App() {
               <DistributionPanel
                 data={distribution}
                 loading={distLoading}
-                area={selectedArea}
               />
 
               {/* ── Right: Filters + Table ── */}
@@ -252,7 +251,6 @@ export default function App() {
                     items={results?.items}
                     total={results?.total ?? 0}
                     page={currentPage}
-                    perPage={PER_PAGE}
                     totalPages={results?.total_pages ?? 1}
                     loading={resultsLoading}
                     onPageChange={handlePageChange}
