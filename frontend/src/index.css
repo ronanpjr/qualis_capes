@@ -276,6 +276,95 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
+@media (max-width: 480px) {
+  .main-content {
+    padding: var(--sp-3) 0;
+  }
+
+  .area-section {
+    padding: var(--sp-3);
+  }
+
+  .content-grid {
+    gap: var(--sp-3);
+  }
+
+  .header-inner {
+    padding: var(--sp-2);
+  }
+
+  .header-badge {
+    display: none;
+  }
+
+  .search-form {
+    flex-direction: column;
+  }
+
+  .search-form input {
+    flex: 1;
+  }
+
+  .search-form button {
+    align-self: flex-start;
+  }
+
+  .chart-container {
+    height: 240px !important;
+  }
+
+  .content-grid {
+    gap: var(--sp-3);
+  }
+
+  .results-table th,
+  .results-table td {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+
+  .results-table {
+    font-size: 12px;
+  }
+
+  .table-card {
+    padding: 12px !important;
+  }
+
+  .filters-card {
+    padding: 16px !important;
+  }
+
+  .chart-card {
+    padding: 16px !important;
+  }
+
+  .empty-card {
+    padding: 32px 16px !important;
+  }
+
+  /* Mobile Journal Card */
+  .mobile-journal-card {
+    background: var(--white);
+    border: 1px solid var(--neutral-200);
+    border-radius: var(--radius-md);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .pagination {
+    gap: 4px;
+  }
+
+  .pagination button {
+    min-width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+}
+
 /* --- Cards --- */
 .card {
   background: var(--white);
@@ -685,9 +774,9 @@ input::placeholder {
 }
 
 .dark .app-footer {
-  background: var(--neutral-900);
-  border-top-color: var(--neutral-800);
-  color: var(--neutral-400);
+  background: var(--primary-50);
+  border-top-color: var(--neutral-200);
+  color: var(--neutral-700);
 }
 
 .dark .app-footer strong {

@@ -145,7 +145,7 @@ export default function App() {
 
           {/* Content panel — only after area is selected */}
           {!hasContent ? (
-            <div className="card" style={{ padding: '64px 24px' }}>
+            <div className="card empty-card" style={{ padding: '64px 24px' }}>
               <div className="empty-state">
                 <div className="empty-state-icon">
                   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -169,14 +169,14 @@ export default function App() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
                 {/* Filters card */}
-                <div className="card" style={{ padding: '20px' }}>
+                <div className="card filters-card" style={{ padding: '20px' }}>
                   <ClassificationFilter
                     selected={selectedEstratos}
                     onChange={handleEstratoChange}
                   />
 
                   <div style={{ marginTop: '16px' }}>
-                    <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '8px' }}>
+                    <form onSubmit={handleSearchSubmit} className="search-form" style={{ display: 'flex', gap: '8px' }}>
                       <input
                         type="text"
                         value={searchInput}
@@ -243,7 +243,7 @@ export default function App() {
                 )}
 
                 {/* Results table card */}
-                <div className="card" style={{ padding: '20px' }}>
+                <div className="card table-card" style={{ padding: '20px' }}>
                   <div style={{ marginBottom: '12px' }}>
                     <h2 className="section-title" style={{ marginBottom: 0 }}>{selectedArea}</h2>
                   </div>
