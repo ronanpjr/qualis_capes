@@ -31,6 +31,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-qualis_db}
       DB_HOST: postgres
       GEMINI_API_KEY: ${GEMINI_API_KEY}
+      PROD_ORIGIN: ${PROD_ORIGIN}
     depends_on:
       postgres:
         condition: service_healthy

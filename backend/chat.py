@@ -150,58 +150,67 @@ async def handle_chat(message: str, db: Session) -> ChatResponse:
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY não configurada.")
 
-    client = genai.Client(api_key=api_key)
-    chat = client.chats.create(
-        model="gemini-2.5-flash",
-        config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_INSTRUCTION,
-            tools=TOOLS,
-            temperature=0.2,
-            thinking_config=types.ThinkingConfig(include_thoughts=False),
-        ),
-    )
+    try:
+        client = genai.Client(api_key=api_key)
+        chat = client.chats.create(
+            model="gemini-2.5-flash",
+            config=types.GenerateContentConfig(
+                system_instruction=SYSTEM_INSTRUCTION,
+                tools=TOOLS,
+                temperature=0.2,
+                thinking_config=types.ThinkingConfig(include_thoughts=False),
+            ),
+        )
+    except Exception as e:
+        raise RuntimeError(f"Erro ao conectar com Gemini API: {str(e)}")
 
     action_taken = None
     raw_data = None
 
     # --- Turno 1: Envia mensagem e recebe instrução (possível function call) ---
-    response = chat.send_message(message)
+    try:
+        response = chat.send_message(message)
+    except Exception as e:
+        raise RuntimeError(f"Erro ao processar mensagem no Gemini: {str(e)}")
     
     # Processa possíveis function calls loop
-    while True:
-        # Pega a primeira function call encontrada em qualquer parte da resposta
-        fc = next((p.function_call for p in response.candidates[0].content.parts if p.function_call), None)
-        if not fc:
-            break
+    try:
+        while True:
+            # Pega a primeira function call encontrada em qualquer parte da resposta
+            fc = next((p.function_call for p in response.candidates[0].content.parts if p.function_call), None)
+            if not fc:
+                break
+                
+            action_taken = fc.name
             
-        action_taken = fc.name
-        
-        # Executa a função
-        result = _execute_function(fc.name, fc.args, db)
-        
-        # Salva dados brutos da última chamada
-        if isinstance(result, list) and result:
-            # Se for lista de strings (list_areas), converte para list[dict]
-            if isinstance(result[0], str):
-                raw_data = [{"area": a} for a in result]
+            # Executa a função
+            result = _execute_function(fc.name, fc.args, db)
+            
+            # Salva dados brutos da última chamada
+            if isinstance(result, list) and result:
+                # Se for lista de strings (list_areas), converte para list[dict]
+                if isinstance(result[0], str):
+                    raw_data = [{"area": a} for a in result]
+                else:
+                    # lista de dicts (get_distribuicao)
+                    raw_data = result
+            elif isinstance(result, dict):
+                # search_periodicos retorna {"items": [...], "total": N}
+                raw_data = result.get("items")
             else:
-                # lista de dicts (get_distribuicao)
-                raw_data = result
-        elif isinstance(result, dict):
-            # search_periodicos retorna {"items": [...], "total": N}
-            raw_data = result.get("items")
-        else:
-            raw_data = [] # Fallback
-            
-        # --- Turno 2+: Envia resultado da função de volta para o Chat ---
-        response = chat.send_message(
-            types.Part(
-                function_response=types.FunctionResponse(
-                    name=fc.name,
-                    response={"result": result},
+                raw_data = [] # Fallback
+                
+            # --- Turno 2+: Envia resultado da função de volta para o Chat ---
+            response = chat.send_message(
+                types.Part(
+                    function_response=types.FunctionResponse(
+                        name=fc.name,
+                        response={"result": result},
+                    )
                 )
             )
-        )
+    except Exception as e:
+        raise RuntimeError(f"Erro ao executar função: {str(e)}")
 
     return ChatResponse(
         response=response.text or "Não foi possível formatar a resposta.",

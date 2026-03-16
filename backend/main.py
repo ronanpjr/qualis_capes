@@ -12,8 +12,10 @@ Segurança:
   - Inputs validados com Pydantic
   - Queries parametrizadas (ver queries.py)
   - CORS restrito a origens conhecidas
+  - Logging de auditoria em todos os endpoints
 """
 
+import logging
 import math
 import os
 from contextlib import asynccontextmanager
@@ -44,6 +46,19 @@ from schemas import (
 )
 
 load_dotenv()
+
+# Configurar logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# Handler para console
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - [%(funcName)s] %(message)s"
+    )
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
 
 # ---------------------------------------------------------------------------
 # Rate limiter
@@ -120,9 +135,12 @@ async def add_security_headers(request: Request, call_next):
 @limiter.limit("60/minute")
 def list_areas(request: Request, db: Annotated[Session, Depends(get_db)]):
     """Lista todas as 50 áreas de avaliação disponíveis, ordenadas alfabeticamente."""
+    client_ip = request.client.host if request.client else "unknown"
+    logger.info(f"GET /api/areas from {client_ip}")
     areas = queries.get_areas(db)
     if not areas:
         raise HTTPException(status_code=404, detail="Nenhuma área encontrada.")
+    logger.debug(f"Returned {len(areas)} areas")
     return areas
 
 
@@ -144,19 +162,39 @@ def search_periodicos(
     - **search**: busca por título ou ISSN (case-insensitive)
     - **page** / **per_page**: paginação (máx 100 por página)
     """
+    client_ip = request.client.host if request.client else "unknown"
+    logger.info(f"GET /api/periodicos from {client_ip} - area={area}, estrato={estrato}, search={search}, page={page}, per_page={per_page}")
+    
+    # Valida área se fornecida
+    if area:
+        valid_areas = queries.get_areas(db)
+        if area not in valid_areas:
+            logger.warning(f"Invalid area requested: {area}")
+            raise HTTPException(
+                status_code=422,
+                detail=f"Área '{area}' não existe. Áreas disponíveis: {', '.join(sorted(valid_areas)[:5])}...",
+            )
+
     # Valida estrato se fornecido
     if estrato:
         invalidos = [e for e in estrato if e not in queries.VALID_ESTRATOS]
         if invalidos:
+            logger.warning(f"Invalid estratos requested: {invalidos}")
             raise HTTPException(
                 status_code=422,
                 detail=f"Estratos inválidos: {', '.join(invalidos)}. Use: {', '.join(sorted(queries.VALID_ESTRATOS))}",
             )
 
+    # Sanitiza busca: escapar wildcards ILIKE
+    sanitized_search = None
+    if search:
+        sanitized_search = search.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
     items, total = queries.search_periodicos(
-        db, area=area, estrato=estrato, search=search, page=page, per_page=per_page
+        db, area=area, estrato=estrato, search=sanitized_search, page=page, per_page=per_page
     )
 
+    logger.debug(f"Returned {len(items)} periodicos, total={total}")
     return PaginatedResponse(
         items=[PeriodicoResponse(**item) for item in items],
         total=total,
@@ -177,14 +215,19 @@ def get_distribuicao(request: Request, area: str, db: Annotated[Session, Depends
     Retorna a distribuição de estratos (contagem e percentual) para uma área específica.
     Ordenação semântica: A1 → C.
     """
+    client_ip = request.client.host if request.client else "unknown"
+    logger.info(f"GET /api/areas/{{area}}/distribuicao from {client_ip} - area={area}")
+    
     distribuicao = queries.get_distribuicao(db, area=area)
     if not distribuicao:
+        logger.warning(f"Area not found for distribuicao: {area}")
         raise HTTPException(
             status_code=404,
             detail=f"Área '{area}' não encontrada ou sem dados.",
         )
 
     total = sum(item["count"] for item in distribuicao)
+    logger.debug(f"Distribuicao returned for {area}: total={total}")
     return DistribuicaoResponse(
         area=area,
         total=total,
@@ -204,7 +247,17 @@ async def chat(
     O modelo interpreta a mensagem e aciona os endpoints corretos automaticamente.
     Rate-limited a 10 req/min por IP.
     """
-    return await handle_chat(body.message, db)
+    client_ip = request.client.host if request.client else "unknown"
+    message_preview = body.message[:50] + "..." if len(body.message) > 50 else body.message
+    logger.info(f"POST /api/chat from {client_ip} - message_preview={message_preview}")
+    
+    try:
+        result = await handle_chat(body.message, db)
+        logger.debug(f"Chat response action: {result.action_taken}")
+        return result
+    except Exception as e:
+        logger.error(f"Error in chat handler: {str(e)}")
+        raise HTTPException(status_code=503, detail="Serviço de IA temporariamente indisponível.")
 
 
 # ---------------------------------------------------------------------------
