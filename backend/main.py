@@ -86,7 +86,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # CORS — origens explícitas conforme SECURITY_GUIDELINES.md
 origins = [
     "http://localhost:5173",
-    "http://localhost:3000",
+    "https://qualis-capes.vercel.app",
 ]
 app.add_middleware(
     CORSMiddleware,
