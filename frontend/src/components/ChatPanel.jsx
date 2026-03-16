@@ -34,9 +34,9 @@ export default function ChatPanel() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userMessage })
       })
-      
+
       if (!res.ok) throw new Error('Erro na comunicação com o assistente')
-      
+
       const data = await res.json()
       setMessages(prev => [...prev, { role: 'assistant', text: data.response }])
     } catch (error) {
@@ -174,7 +174,7 @@ export default function ChatPanel() {
                 )}
               </div>
             ))}
-            
+
             {loading && (
               <div style={{
                 alignSelf: 'flex-start',

@@ -1,7 +1,8 @@
 const BASE_URL = import.meta.env.VITE_API_URL
 
 async function apiFetch(path, params = {}) {
-  const url = new URL(`${BASE_URL}${path}`)
+  const prefix = path === '/health' ? '' : '/api'
+  const url = new URL(`${BASE_URL}${prefix}${path}`)
   Object.entries(params).forEach(([key, value]) => {
     if (value !== null && value !== undefined && value !== '') {
       if (Array.isArray(value)) {
