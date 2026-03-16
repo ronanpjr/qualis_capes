@@ -88,6 +88,7 @@ origins = [
     "http://localhost:5173",
     "http://localhost:3000",
 ]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -126,12 +127,12 @@ def list_areas(request: Request, db: Annotated[Session, Depends(get_db)]):
 @limiter.limit("60/minute")
 def search_periodicos(
     request: Request,
+    db: Annotated[Session, Depends(get_db)],
     area: Annotated[str | None, Query(max_length=200)] = None,
     estrato: Annotated[list[str] | None, Query()] = None,
     search: Annotated[str | None, Query(max_length=200, strip_whitespace=True)] = None,
     page: Annotated[int, Query(ge=1)] = 1,
     per_page: Annotated[int, Query(ge=1, le=100)] = 30,
-    db: Annotated[Session, Depends(get_db)],
 ):
     """
     Busca periódicos com filtros opcionais.
