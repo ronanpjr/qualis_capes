@@ -7,6 +7,14 @@ Ferramenta para consultar e analisar classificações QUALIS de periódicos cien
 
 > **Dados:** Classificação de Periódicos — Quadriênio 2021-2024 (Plataforma Sucupira)
 
+![Interface do Sistema](docs/sonar_screenshots/interface.png)
+
+A interface foi projetada para ser intuitiva e responsiva, oferecendo:
+- **Busca Global:** Filtre instantaneamente por título ou ISSN.
+- **Filtros por Área e Estrato:** Seleção múltipla para análises específicas.
+- **Painel de Distribuição:** Gráficos dinâmicos que mostram o perfil de qualidade da área selecionada.
+- **Chat com IA:** Consulta em linguagem natural integrada para facilitar a descoberta de dados.
+
 *Nota: O enunciado mencionava a escala antiga (com B5), porém, para refletir fielmente a base de dados oficial do quadriênio 2021-2024 fornecida, o sistema foi adaptado para a escala atual (A1-A4, B1-B4, C).*
 
 ---
