@@ -103,25 +103,38 @@ export default function ChatPanel() {
         }}>
           {/* Header */}
           <div style={{
-            background: 'var(--primary-900)',
-            color: 'var(--white)',
-            padding: '16px',
+            background: 'var(--primary-100)',
+            color: 'var(--primary-900)',
+            padding: '16px 20px',
             display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
+            flexDirection: 'column',
+            gap: '2px',
+            borderBottom: '1px solid var(--neutral-200)',
           }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '4px',
+                background: 'var(--accent)',
+              }} />
+              <div style={{
+                fontFamily: 'var(--font-serif)',
+                fontWeight: 600,
+                fontSize: '15px',
+              }}>
+                Assistente IA
+              </div>
+            </div>
             <div style={{
-              width: '8px',
-              height: '8px',
-              borderRadius: '4px',
-              background: 'var(--estrato-a1-text)', // verde
-            }} />
-            <div style={{
-              fontFamily: 'var(--font-sans)',
+              fontSize: '10px',
               fontWeight: 600,
-              fontSize: '15px',
+              color: 'var(--primary-500)',
+              letterSpacing: '0.05em',
+              textTransform: 'uppercase',
+              marginLeft: '16px'
             }}>
-              Assistente IA
+              Powered by Gemini
             </div>
           </div>
 

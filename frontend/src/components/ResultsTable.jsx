@@ -1,9 +1,46 @@
 export default function ResultsTable({ items, total, page, perPage, totalPages, loading, onPageChange }) {
   if (loading) {
     return (
-      <div className="loading-spinner">
-        <div className="spinner" />
-        <span>Buscando periódicos…</span>
+      <div className="animate-in">
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '12px',
+        }}>
+          <div className="skeleton skeleton-text" style={{ width: '150px', margin: 0 }}></div>
+          <div className="skeleton skeleton-text" style={{ width: '80px', margin: 0 }}></div>
+        </div>
+
+        <div style={{ overflowX: 'auto', border: '1px solid var(--neutral-200)', borderRadius: 'var(--radius-md)' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+            <thead>
+              <tr style={{ background: 'var(--primary-50)' }}>
+                <th style={thStyle}>ISSN</th>
+                <th style={{ ...thStyle, textAlign: 'left', width: '100%' }}>Título do Periódico</th>
+                <th style={thStyle}>Estrato</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...Array(10)].map((_, idx) => (
+                <tr key={`skeleton-${idx}`} style={{
+                  background: idx % 2 === 0 ? 'var(--white)' : 'var(--neutral-50)',
+                  borderBottom: '1px solid var(--neutral-200)',
+                }}>
+                  <td style={tdStyle}>
+                    <div className="skeleton skeleton-text" style={{ width: '80px', margin: '0 auto' }}></div>
+                  </td>
+                  <td style={{ ...tdStyle, textAlign: 'left' }}>
+                    <div className="skeleton skeleton-text" style={{ width: '60%', margin: 0 }}></div>
+                  </td>
+                  <td style={tdStyle}>
+                    <div className="skeleton skeleton-badge" style={{ margin: '0 auto' }}></div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     )
   }
@@ -19,7 +56,7 @@ export default function ResultsTable({ items, total, page, perPage, totalPages, 
   }
 
   return (
-    <div>
+    <div className="animate-in">
       <div style={{
         display: 'flex',
         alignItems: 'center',
@@ -34,7 +71,7 @@ export default function ResultsTable({ items, total, page, perPage, totalPages, 
         </span>
       </div>
 
-      <div style={{ overflowX: 'auto' }}>
+      <div style={{ overflowX: 'auto', borderRadius: 'var(--radius-md)', border: '1px solid var(--neutral-200)' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
           <thead>
             <tr style={{ background: 'var(--primary-50)' }}>
@@ -50,7 +87,7 @@ export default function ResultsTable({ items, total, page, perPage, totalPages, 
                 style={{
                   background: idx % 2 === 0 ? 'var(--white)' : 'var(--neutral-50)',
                   borderBottom: '1px solid var(--neutral-200)',
-                  transition: 'background 0.1s',
+                  transition: 'background 0.2s',
                 }}
                 onMouseEnter={e => e.currentTarget.style.background = 'var(--primary-100)'}
                 onMouseLeave={e => e.currentTarget.style.background = idx % 2 === 0 ? 'var(--white)' : 'var(--neutral-50)'}
@@ -75,8 +112,8 @@ export default function ResultsTable({ items, total, page, perPage, totalPages, 
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: '4px',
-          paddingTop: '16px',
+          gap: '6px',
+          paddingTop: '20px',
         }}>
           <PageButton
             onClick={() => onPageChange(1)}
@@ -126,17 +163,31 @@ function PageButton({ onClick, disabled, active, children, title }) {
       disabled={disabled}
       title={title}
       style={{
-        minWidth: '32px',
-        height: '32px',
-        padding: '0 6px',
-        borderRadius: '6px',
+        minWidth: '36px',
+        height: '36px',
+        padding: '0 8px',
+        borderRadius: 'var(--radius-md)',
+        fontFamily: 'var(--font-sans)',
         fontSize: '13px',
-        fontWeight: active ? 600 : 400,
-        background: active ? 'var(--primary-700)' : 'var(--white)',
+        fontWeight: active ? 600 : 500,
+        background: active ? 'var(--primary-900)' : 'var(--white)',
         color: active ? 'var(--white)' : disabled ? 'var(--neutral-400)' : 'var(--neutral-700)',
-        border: `1px solid ${active ? 'var(--primary-700)' : 'var(--neutral-200)'}`,
+        border: `1px solid ${active ? 'var(--primary-900)' : 'var(--neutral-200)'}`,
         cursor: disabled ? 'not-allowed' : 'pointer',
-        transition: 'all 0.15s',
+        transition: 'all 0.2s',
+        boxShadow: active ? 'var(--shadow-md)' : 'var(--shadow-sm)'
+      }}
+      onMouseEnter={e => {
+        if (!disabled && !active) {
+          e.currentTarget.style.background = 'var(--neutral-50)';
+          e.currentTarget.style.borderColor = 'var(--neutral-400)';
+        }
+      }}
+      onMouseLeave={e => {
+        if (!disabled && !active) {
+          e.currentTarget.style.background = 'var(--white)';
+          e.currentTarget.style.borderColor = 'var(--neutral-200)';
+        }
       }}
     >
       {children}
@@ -158,19 +209,19 @@ function getPageNumbers(current, total) {
 }
 
 const thStyle = {
-  padding: '10px 16px',
+  padding: '12px 16px',
   textAlign: 'center',
   fontWeight: 600,
   fontSize: '12px',
-  color: 'var(--primary-900)',
+  color: 'var(--neutral-700)',
   textTransform: 'uppercase',
-  letterSpacing: '0.04em',
+  letterSpacing: '0.06em',
   borderBottom: '2px solid var(--neutral-200)',
   whiteSpace: 'nowrap',
 }
 
 const tdStyle = {
-  padding: '10px 16px',
+  padding: '12px 16px',
   textAlign: 'center',
   verticalAlign: 'middle',
 }

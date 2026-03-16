@@ -1,41 +1,46 @@
 /* ===========================
-   QUALIS CAPES — Design System
+   QUALIS CAPES — Design System (Premium)
    =========================== */
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/outfit/600.css';
+@import '@fontsource/outfit/700.css';
 
 /* --- CSS Variables --- */
 :root {
-  /* Primary — Azul Institucional */
-  --primary-900: #0D1B3E;
-  --primary-700: #1A3A6B;
-  --primary-500: #2E5EA1;
-  --primary-100: #E8EEF6;
-  --primary-50:  #F4F7FB;
+  /* Primary — Deep / Sleek Indigo */
+  --primary-900: #0f172a;
+  --primary-700: #1e293b;
+  --primary-500: #3b82f6; /* Accent blue */
+  --primary-100: #e0e7ff;
+  --primary-50:  #f8fafc; /* Sleek light mode background */
 
   /* Neutral */
-  --neutral-900: #1F2937;
-  --neutral-700: #374151;
-  --neutral-400: #9CA3AF;
-  --neutral-200: #E5E7EB;
-  --neutral-50:  #F9FAFB;
-  --white:       #FFFFFF;
+  --neutral-900: #020617;
+  --neutral-700: #334155;
+  --neutral-400: #94a3b8;
+  --neutral-200: #e2e8f0;
+  --neutral-50:  #f1f5f9;
+  --white:       #ffffff;
 
-  /* Estratos */
-  --estrato-a1-text: #166534; --estrato-a1-bg: #DCFCE7;
-  --estrato-a2-text: #15803D; --estrato-a2-bg: #DCFCE7;
-  --estrato-a3-text: #3B82F6; --estrato-a3-bg: #DBEAFE;
-  --estrato-a4-text: #6366F1; --estrato-a4-bg: #E0E7FF;
-  --estrato-b1-text: #CA8A04; --estrato-b1-bg: #FEF9C3;
-  --estrato-b2-text: #D97706; --estrato-b2-bg: #FEF3C7;
-  --estrato-b3-text: #EA580C; --estrato-b3-bg: #FFEDD5;
-  --estrato-b4-text: #DC2626; --estrato-b4-bg: #FEE2E2;
-  --estrato-c-text:  #6B7280; --estrato-c-bg:  #F3F4F6;
+  /* Estratos (Customized for premium visibility) */
+  --estrato-a1-text: #064e3b; --estrato-a1-bg: #d1fae5; --estrato-a1-chart: #064e3b;
+  --estrato-a2-text: #047857; --estrato-a2-bg: #a7f3d0; --estrato-a2-chart: #047857;
+  --estrato-a3-text: #1d4ed8; --estrato-a3-bg: #dbeafe; --estrato-a3-chart: #1d4ed8;
+  --estrato-a4-text: #0369a1; --estrato-a4-bg: #e0f2fe; --estrato-a4-chart: #0369a1;
+  --estrato-b1-text: #854d0e; --estrato-b1-bg: #fef08a; --estrato-b1-chart: #854d0e;
+  --estrato-b2-text: #b45309; --estrato-b2-bg: #fde68a; --estrato-b2-chart: #b45309;
+  --estrato-b3-text: #c2410c; --estrato-b3-bg: #ffedd5; --estrato-b3-chart: #c2410c;
+  --estrato-b4-text: #9a3412; --estrato-b4-bg: #fed7aa; --estrato-b4-chart: #9a3412;
+  --estrato-c-text:  #991b1b; --estrato-c-bg:  #fee2e2; --estrato-c-chart:  #991b1b;
 
   /* Accent */
-  --accent:  #059669;
-  --danger:  #DC2626;
-  --warning: #D97706;
+  --accent:  #10b981;
+  --danger:  #ef4444;
+  --warning: #f59e0b;
 
-  /* Spacing base: 4px */
+  /* Spacing */
   --sp-1: 4px;
   --sp-2: 8px;
   --sp-3: 12px;
@@ -45,8 +50,67 @@
   --sp-12: 48px;
 
   /* Typography */
-  --font-serif: 'Merriweather', Georgia, serif;
-  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-serif: 'Outfit', system-ui, sans-serif; /* Using Outfit for headings/logos */
+  --font-sans: 'Inter', system-ui, sans-serif; /* Using Inter for body */
+
+  /* Shadows (Premium layered shadows) */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+  
+  /* Borders */
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+}
+
+/* --- Dark Mode Overrides --- */
+:root.dark {
+  /* Primary — Adapted for dark mode */
+  --primary-900: #e2e8f0; /* Light text for primary buttons */
+  --primary-700: #f8fafc; /* Lighter hover */
+  --primary-500: #60a5fa; /* Accent blue, slightly brighter for contrast */
+  --primary-100: #1e293b;
+  --primary-50:  #0f172a; /* Main app background */
+
+  /* Neutral */
+  --neutral-900: #f8fafc; /* Main text */
+  --neutral-700: #cbd5e1; /* Secondary text */
+  --neutral-400: #64748b; /* Disabled/Placeholder */
+  --neutral-200: #334155; /* Borders */
+  --neutral-50:  #1e293b; /* Card backgrounds, inputs */
+  --white:       #1e293b; /* Surface backgrounds */
+
+  /* Shadows adapted for dark mode */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.5);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5);
+
+  /* Chart Colors (Brightened for dark mode) */
+  --estrato-a1-chart: #10b981;
+  --estrato-a2-chart: #34d399;
+  --estrato-a3-chart: #60a5fa;
+  --estrato-a4-chart: #93c5fd;
+  --estrato-b1-chart: #fbbf24;
+  --estrato-b2-chart: #f59e0b;
+  --estrato-b3-chart: #fb923c;
+  --estrato-b4-chart: #f97316;
+  --estrato-c-chart:  #f87171;
+
+  /* Fix for header background in dark mode via variable overriding */
+  --header-bg: rgba(30, 41, 59, 0.85);
+  --header-border: rgba(51, 65, 85, 0.8);
+}
+
+:root.dark .card {
+  border: 1px solid rgba(51, 65, 85, 0.8);
+}
+
+:root.dark input, :root.dark select {
+  background: var(--neutral-50);
 }
 
 /* --- Reset --- */
@@ -59,6 +123,7 @@
 html {
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -66,8 +131,23 @@ body {
   font-size: 14px;
   color: var(--neutral-900);
   background-color: var(--primary-50);
-  line-height: 1.5;
+  line-height: 1.6;
   min-height: 100vh;
+}
+
+/* --- Animations & Utilities --- */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-in {
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* --- Layout --- */
@@ -77,14 +157,17 @@ body {
   padding: 0 var(--sp-4);
 }
 
-/* --- Header --- */
+/* --- Header (Glassmorphism) --- */
 .app-header {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: var(--white);
-  border-bottom: 1px solid var(--neutral-200);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  background: var(--header-bg, rgba(255, 255, 255, 0.85)); /* Glass */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--header-border, rgba(226, 232, 240, 0.8));
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
 }
 
 .header-inner {
@@ -98,10 +181,11 @@ body {
 
 .header-logo {
   font-family: var(--font-serif);
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   color: var(--primary-900);
   line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 .header-logo span {
@@ -109,45 +193,52 @@ body {
   font-family: var(--font-sans);
   font-size: 11px;
   font-weight: 500;
-  color: var(--neutral-700);
-  letter-spacing: 0.04em;
+  color: var(--neutral-400);
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   margin-top: 2px;
 }
 
 .header-badge {
-  margin-left: auto;
   background: var(--primary-100);
   color: var(--primary-700);
   font-size: 11px;
   font-weight: 600;
-  padding: 3px 10px;
-  border-radius: 12px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
 }
 
 /* --- Cards --- */
 .card {
   background: var(--white);
-  border: 1px solid var(--neutral-200);
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
 }
 
 /* --- Section Titles --- */
 .section-title {
-  font-family: var(--font-sans);
-  font-size: 16px;
+  font-family: var(--font-serif);
+  font-size: 18px;
   font-weight: 600;
   color: var(--neutral-900);
   margin-bottom: var(--sp-4);
+  letter-spacing: -0.01em;
 }
 
 .section-subtitle {
+  font-family: var(--font-sans);
   font-size: 12px;
-  font-weight: 500;
-  color: var(--neutral-700);
+  font-weight: 600;
+  color: var(--neutral-400);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   margin-bottom: var(--sp-3);
 }
 
@@ -160,15 +251,27 @@ button {
 }
 
 .btn-primary {
-  background: var(--primary-700);
+  background: var(--primary-900);
   color: var(--white);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   padding: var(--sp-2) var(--sp-4);
-  border-radius: 6px;
-  transition: background 0.15s ease;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
-.btn-primary:hover { background: var(--primary-500); }
+.btn-primary:hover { 
+  background: var(--primary-700); 
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+.btn-primary:active {
+  transform: translateY(0);
+}
 
 /* --- Inputs --- */
 input, select {
@@ -176,16 +279,17 @@ input, select {
   font-size: 14px;
   color: var(--neutral-900);
   background: var(--white);
-  border: 1px solid var(--neutral-400);
-  border-radius: 6px;
-  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
   width: 100%;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: all 0.2s ease;
   outline: none;
+  box-shadow: var(--shadow-sm);
 }
 input:focus, select:focus {
   border-color: var(--primary-500);
-  box-shadow: 0 0 0 3px var(--primary-100);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); /* Tailwind blue focus ring */
 }
 input::placeholder {
   color: var(--neutral-400);
@@ -194,12 +298,12 @@ input::placeholder {
 /* --- Estrato Badges --- */
 .badge {
   display: inline-block;
-  padding: 2px 10px;
-  border-radius: 12px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 }
 .badge-A1 { color: var(--estrato-a1-text); background: var(--estrato-a1-bg); }
 .badge-A2 { color: var(--estrato-a2-text); background: var(--estrato-a2-bg); }
@@ -214,6 +318,7 @@ input::placeholder {
 /* --- Main content layout --- */
 .main-content {
   padding: var(--sp-6) 0;
+  animation: fadeIn 0.5s ease-out;
 }
 
 .area-section {
@@ -223,9 +328,15 @@ input::placeholder {
 
 .content-grid {
   display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: var(--sp-4);
+  grid-template-columns: 360px 1fr;
+  gap: var(--sp-6);
   align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* --- Empty state --- */
@@ -237,10 +348,12 @@ input::placeholder {
 .empty-state-icon {
   font-size: 48px;
   margin-bottom: var(--sp-4);
-  opacity: 0.5;
+  opacity: 0.7;
 }
 .empty-state p {
-  font-size: 15px;
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 500;
   color: var(--neutral-700);
   margin-bottom: var(--sp-2);
 }
@@ -249,7 +362,7 @@ input::placeholder {
   color: var(--neutral-400);
 }
 
-/* --- Loading state --- */
+/* --- Loading state (Basic, kept as fallback but superseded by Skeletons in components) --- */
 .loading-spinner {
   display: flex;
   align-items: center;
@@ -259,23 +372,85 @@ input::placeholder {
   gap: var(--sp-3);
 }
 .spinner {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   border: 2px solid var(--neutral-200);
   border-top-color: var(--primary-500);
   border-radius: 50%;
-  animation: spin 0.7s linear infinite;
+  animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* --- Skeleton Loaders --- */
+@keyframes skeleton-loading {
+  0% { background-color: var(--neutral-200); }
+  50% { background-color: var(--neutral-50); }
+  100% { background-color: var(--neutral-200); }
+}
+
+.skeleton {
+  animation: skeleton-loading 1.5s infinite ease-in-out;
+  border-radius: var(--radius-md);
+}
+
+.skeleton-text {
+  height: 14px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+.skeleton-title {
+  height: 20px;
+  width: 50%;
+  margin-bottom: 16px;
+}
+.skeleton-badge {
+  height: 24px;
+  width: 40px;
+  border-radius: var(--radius-full);
+}
+
 /* --- Error state --- */
 .error-message {
-  background: #FEE2E2;
+  background: #fef2f2;
   color: var(--danger);
-  border: 1px solid #FECACA;
-  border-radius: 6px;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-md);
   padding: var(--sp-3) var(--sp-4);
   font-size: 13px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- Markdown Body (for Chat) --- */
+.markdown-body {
+  font-family: var(--font-sans);
+}
+.markdown-body p { margin-bottom: 8px; }
+.markdown-body p:last-child { margin-bottom: 0; }
+.markdown-body ul, .markdown-body ol { margin-left: 20px; margin-bottom: 8px; }
+.markdown-body strong { font-weight: 600; color: inherit; }
+
+/* Typing Indicator (Typing Dots) */
+.typing-dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+}
+
+.typing-dots span {
+  width: 6px;
+  height: 6px;
+  background-color: var(--neutral-400);
+  border-radius: 50%;
+  animation: typing 1.4s infinite ease-in-out both;
+}
+
+.typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+.typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typing {
+  0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+  40% { transform: scale(1); opacity: 1; }
 }
 
 /* --- Responsive --- */
@@ -285,3 +460,4 @@ input::placeholder {
   }
   .header-badge { display: none; }
 }
+

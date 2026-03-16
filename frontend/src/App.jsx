@@ -24,6 +24,23 @@ export default function App() {
   const [searchInput, setSearchInput] = useState('') // local input state
   const [currentPage, setCurrentPage] = useState(1)
 
+  // --- Theme State ---
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return document.documentElement.classList.contains('dark') || 
+             window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
+  })
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [isDark])
+
   // React to area selection — resets all filters and fetches fresh data
   useEffect(() => {
     setSelectedEstratos([])
@@ -71,7 +88,44 @@ export default function App() {
             QUALIS CAPES
             <span>Consulta de Classificação de Periódicos</span>
           </div>
-          <span className="header-badge">171.111 registros · 50 áreas</span>
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <span className="header-badge">171.111 registros · 50 áreas</span>
+            <button
+              onClick={() => setIsDark(!isDark)}
+              style={{
+                background: 'var(--neutral-50)',
+                border: '1px solid var(--neutral-200)',
+                borderRadius: '50%',
+                width: '36px',
+                height: '36px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--neutral-700)',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+              title="Alternar Tema"
+            >
+              {isDark ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="5"></circle>
+                  <line x1="12" y1="1" x2="12" y2="3"></line>
+                  <line x1="12" y1="21" x2="12" y2="23"></line>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                  <line x1="1" y1="12" x2="3" y2="12"></line>
+                  <line x1="21" y1="12" x2="23" y2="12"></line>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -93,7 +147,12 @@ export default function App() {
           {!hasContent ? (
             <div className="card" style={{ padding: '64px 24px' }}>
               <div className="empty-state">
-                <div className="empty-state-icon">🔍</div>
+                <div className="empty-state-icon">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                </div>
                 <p>Selecione uma área de avaliação para começar</p>
                 <small>Dados das classificações publicadas no Sucupira / CAPES</small>
               </div>
