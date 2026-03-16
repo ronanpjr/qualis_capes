@@ -1,5 +1,8 @@
 # QUALIS CAPES — Consulta de Classificação de Periódicos
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ronanpjr_qualis_capes&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ronanpjr_qualis_capes)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=ronanpjr_qualis_capes&metric=bugs)](https://sonarcloud.io/summary/new_code?id=ronanpjr_qualis_capes)
+
 Ferramenta para consultar e analisar classificações QUALIS de periódicos científicos da CAPES, permitindo que coordenadores de pós-graduação filtrem por área de avaliação e estrato.
 
 > **Dados:** Classificação de Periódicos — Quadriênio 2021-2024 (Plataforma Sucupira)
@@ -116,6 +119,24 @@ SQLAlchemy é usado para definição de modelos e gerenciamento de sessão. **Qu
 
 ### Por que Gemini Function Calling?
 Ao invés de prompt engineering simples, usamos function calling — o modelo recebe as definições dos endpoints como ferramentas e decide qual executar baseado na intenção do usuário.
+
+---
+
+## 🔍 Qualidade de Código (SonarQube Cloud)
+
+O projeto é monitorado pelo **SonarQube Cloud** para garantir a manutenibilidade, segurança e confiabilidade do código.
+
+![SonarQube Cloud - Quality Gate Passed](docs/sonar_screenshots/sonar_passed.png)
+*Estado atual do projeto: Quality Gate Passed com 0 issues de segurança.*
+
+![SonarQube Cloud - Detalhes de Issues](docs/sonar_screenshots/sonar_issues.png)
+*Histórico de análise e evolução da qualidade de código.*
+
+### Principais Correções:
+- **Typing:** Refatoração de tipos no backend (Pydantic/FastAPI) e frontend (PropTypes/JSDoc) para reduzir bugs silenciosos e melhorar o IntelliSense.
+- **Security:** Tratamento de vulnerabilidades em dependências, proteção contra SQL Injection (uso de raw SQL parametrizado) e configuração de headers de segurança via middleware.
+
+
 
 ---
 
