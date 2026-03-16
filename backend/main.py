@@ -88,8 +88,9 @@ PROD_ORIGIN = os.getenv("PROD_ORIGIN")
 origins = [
     "http://localhost:5173",
     "http://localhost:3000",
-    f"{PROD_ORIGIN}",
 ]
+if PROD_ORIGIN:
+    origins.append(PROD_ORIGIN)
 
 app.add_middleware(
     CORSMiddleware,
