@@ -7,9 +7,11 @@ This module demonstrates intentional use of SQL beyond ORM abstractions:
   - Composite filter building with parameterized inputs (no interpolation)
 """
 
-from sqlalchemy import text
+from sqlalchemy import and_, func, or_, select, text
 from sqlalchemy.orm import Session
 from typing import Optional
+
+from models import Periodico
 
 
 # Ordem canônica dos estratos (A1 mais alto → C mais baixo)
@@ -38,51 +40,53 @@ def search_periodicos(
     per_page: int = 30,
 ) -> tuple[list[dict], int]:
     """
-    Busca periódicos com filtros opcionais.
+    Busca periódicos com filtros opcionais usando SQLAlchemy Expression Language.
 
     Técnicas utilizadas:
-    - Construção dinâmica de WHERE com parâmetros bind (seguro contra SQL injection)
-    - ILIKE para busca case-insensitive em título e ISSN
-    - COUNT(*) OVER() como window function: obtém o total na mesma query,
-      sem um segundo round-trip ao banco
+    - SQLAlchemy select().where() para construção dinâmica segura de queries
+    - Proteção automática contra SQL injection via parameterização
+    - ilike() para busca case-insensitive em título e ISSN
+    - Window function COUNT(*) OVER() para obter total sem query separada
     - LIMIT/OFFSET para paginação server-side
     """
-    conditions = []
-    params: dict = {}
+    # Construir filtros dinamicamente usando Expression Language
+    filters = []
 
     if area:
-        conditions.append("area = :area")
-        params["area"] = area
+        filters.append(Periodico.area == area)
 
     if estrato:
-        conditions.append("estrato = ANY(:estrato)")
-        params["estrato"] = estrato
+        filters.append(Periodico.estrato.in_(estrato))
 
     if search:
-        conditions.append("(titulo ILIKE :search OR issn ILIKE :search)")
-        params["search"] = f"%{search}%"
+        search_pattern = f"%{search}%"
+        filters.append(
+            or_(
+                Periodico.titulo.ilike(search_pattern),
+                Periodico.issn.ilike(search_pattern)
+            )
+        )
 
-    where_clause = "WHERE " + " AND ".join(conditions) if conditions else ""
+    # Construir query com Expression Language
+    # Usar window function para contar total em uma única query
+    total_count = func.count().over()
+    stmt = select(
+        Periodico.id,
+        Periodico.issn,
+        Periodico.titulo,
+        Periodico.area,
+        Periodico.estrato,
+        total_count.label("total_count")
+    )
 
-    # Window function: conta total sem query separada
-    sql = text(f"""
-        SELECT
-            id,
-            issn,
-            titulo,
-            area,
-            estrato,
-            COUNT(*) OVER() AS total_count
-        FROM periodicos
-        {where_clause}
-        ORDER BY titulo
-        LIMIT :limit OFFSET :offset
-    """)
+    # Aplicar filtros usando and_(*filters) se houver filtros
+    if filters:
+        stmt = stmt.where(and_(*filters))
 
-    params["limit"] = per_page
-    params["offset"] = (page - 1) * per_page
+    # Aplicar ordenação e paginação
+    stmt = stmt.order_by(Periodico.titulo).limit(per_page).offset((page - 1) * per_page)
 
-    rows = db.execute(sql, params).mappings().fetchall()
+    rows = db.execute(stmt).mappings().fetchall()
 
     if not rows:
         return [], 0

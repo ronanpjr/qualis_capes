@@ -125,13 +125,13 @@ def list_areas(request: Request, db: Annotated[Session, Depends(get_db)]):
 @app.get("/api/periodicos", response_model=PaginatedResponse, tags=["Periódicos"])
 @limiter.limit("60/minute")
 def search_periodicos(
-request: Request,
+    request: Request,
     area: Annotated[str | None, Query(max_length=200)] = None,
     estrato: Annotated[list[str] | None, Query()] = None,
     search: Annotated[str | None, Query(max_length=200, strip_whitespace=True)] = None,
     page: Annotated[int, Query(ge=1)] = 1,
     per_page: Annotated[int, Query(ge=1, le=100)] = 30,
-    db: Annotated[Session, Depends(get_db)] = None,
+    db: Annotated[Session, Depends(get_db)],
 ):
     """
     Busca periódicos com filtros opcionais.

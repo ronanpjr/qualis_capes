@@ -1,4 +1,13 @@
-export default function ResultsTable({ items, total, page, perPage, totalPages, loading, onPageChange }) {
+import { useState, useEffect } from 'react'
+
+export default function ResultsTable({ items, total, page, totalPages, loading, onPageChange }) {
+  const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768)
+
+  useEffect(() => {
+    const handleResize = () => setIsMobileView(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
   if (loading) {
     return (
       <div className="animate-in">
@@ -13,7 +22,7 @@ export default function ResultsTable({ items, total, page, perPage, totalPages, 
         </div>
 
         <div style={{ overflowX: 'auto', border: '1px solid var(--neutral-200)', borderRadius: 'var(--radius-md)' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+          <table className="results-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
             <thead>
               <tr style={{ background: 'var(--primary-50)' }}>
                 <th style={thStyle}>ISSN</th>
@@ -55,6 +64,94 @@ export default function ResultsTable({ items, total, page, perPage, totalPages, 
     )
   }
 
+  // Mobile Card View
+  if (isMobileView) {
+    return (
+      <div className="animate-in">
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '12px',
+        }}>
+          <span style={{ fontSize: '13px', color: 'var(--neutral-700)' }}>
+            <strong style={{ color: 'var(--neutral-900)' }}>{total.toLocaleString('pt-BR')}</strong> periódicos
+          </span>
+          <span style={{ fontSize: '12px', color: 'var(--neutral-400)' }}>
+            Página {page} de {totalPages}
+          </span>
+        </div>
+
+        {/* Mobile Card View */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {items.map((item) => (
+            <div key={item.id} className="mobile-journal-card">
+              <div style={{ marginBottom: '8px' }}>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--neutral-900)' }}>
+                  {item.titulo}
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--neutral-400)', marginTop: '4px' }}>
+                  ISSN: {item.issn || '—'}
+                </div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span className={`badge badge-${item.estrato}`}>{item.estrato}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {totalPages > 1 && (
+          <div className="pagination" style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            paddingTop: '20px',
+            flexWrap: 'wrap'
+          }}>
+            <PageButton
+              onClick={() => onPageChange(1)}
+              disabled={page === 1}
+              title="Primeira"
+            >«</PageButton>
+
+            <PageButton
+              onClick={() => onPageChange(page - 1)}
+              disabled={page === 1}
+              title="Anterior"
+            >‹</PageButton>
+
+            {getPageNumbers(page, totalPages).map((p, i) =>
+              p === '...' ? (
+                <span key={`ellipsis-${i}`} style={{ padding: '0 4px', color: 'var(--neutral-400)' }}>…</span>
+              ) : (
+                <PageButton
+                  key={p}
+                  onClick={() => onPageChange(p)}
+                  active={p === page}
+                >{p}</PageButton>
+              )
+            )}
+
+            <PageButton
+              onClick={() => onPageChange(page + 1)}
+              disabled={page === totalPages}
+              title="Próxima"
+            >›</PageButton>
+
+            <PageButton
+              onClick={() => onPageChange(totalPages)}
+              disabled={page === totalPages}
+              title="Última"
+            >»</PageButton>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // Desktop Table View
   return (
     <div className="animate-in">
       <div style={{
@@ -72,7 +169,7 @@ export default function ResultsTable({ items, total, page, perPage, totalPages, 
       </div>
 
       <div style={{ overflowX: 'auto', borderRadius: 'var(--radius-md)', border: '1px solid var(--neutral-200)' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+        <table className="results-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
           <thead>
             <tr style={{ background: 'var(--primary-50)' }}>
               <th style={thStyle}>ISSN</th>
@@ -108,7 +205,7 @@ export default function ResultsTable({ items, total, page, perPage, totalPages, 
       </div>
 
       {totalPages > 1 && (
-        <div style={{
+        <div className="pagination" style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

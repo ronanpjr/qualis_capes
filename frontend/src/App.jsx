@@ -145,7 +145,7 @@ export default function App() {
 
           {/* Content panel — only after area is selected */}
           {!hasContent ? (
-            <div className="card" style={{ padding: '64px 24px' }}>
+            <div className="card empty-card" style={{ padding: '64px 24px' }}>
               <div className="empty-state">
                 <div className="empty-state-icon">
                   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -163,21 +163,20 @@ export default function App() {
               <DistributionPanel
                 data={distribution}
                 loading={distLoading}
-                area={selectedArea}
               />
 
               {/* ── Right: Filters + Table ── */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
                 {/* Filters card */}
-                <div className="card" style={{ padding: '20px' }}>
+                <div className="card filters-card" style={{ padding: '20px' }}>
                   <ClassificationFilter
                     selected={selectedEstratos}
                     onChange={handleEstratoChange}
                   />
 
                   <div style={{ marginTop: '16px' }}>
-                    <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '8px' }}>
+                    <form onSubmit={handleSearchSubmit} className="search-form" style={{ display: 'flex', gap: '8px' }}>
                       <input
                         type="text"
                         value={searchInput}
@@ -244,7 +243,7 @@ export default function App() {
                 )}
 
                 {/* Results table card */}
-                <div className="card" style={{ padding: '20px' }}>
+                <div className="card table-card" style={{ padding: '20px' }}>
                   <div style={{ marginBottom: '12px' }}>
                     <h2 className="section-title" style={{ marginBottom: 0 }}>{selectedArea}</h2>
                   </div>
@@ -252,7 +251,6 @@ export default function App() {
                     items={results?.items}
                     total={results?.total ?? 0}
                     page={currentPage}
-                    perPage={PER_PAGE}
                     totalPages={results?.total_pages ?? 1}
                     loading={resultsLoading}
                     onPageChange={handlePageChange}
@@ -265,16 +263,9 @@ export default function App() {
       </main>
 
       {/* ── Footer ── */}
-      <footer style={{
-        marginTop: '48px',
-        padding: '24px',
-        borderTop: '1px solid var(--neutral-200)',
-        background: 'var(--white)',
-        textAlign: 'center',
-        fontSize: '12px',
-        color: 'var(--neutral-400)',
-      }}>
-        Dados: QUALIS CAPES — Classificações Publicadas no Sucupira
+      <footer className="app-footer">
+        <p>Dados: QUALIS CAPES — Classificações Publicadas no Sucupira</p>
+        <p>Desenvolvido por <strong>Ronan Junior</strong></p>
       </footer>
 
       {/* ── Chatbot ── */}

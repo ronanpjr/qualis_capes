@@ -16,7 +16,7 @@ const ESTRATO_COLORS = {
   C:  'var(--estrato-c-chart)',
 }
 
-export default function DistributionPanel({ data, loading, area }) {
+export default function DistributionPanel({ data, loading }) {
   const { chartData, total } = useMemo(() => {
     if (!data || data.length === 0) return { chartData: [], total: 0 }
 
@@ -36,7 +36,7 @@ export default function DistributionPanel({ data, loading, area }) {
 
   if (loading) {
     return (
-      <div className="card" style={{ padding: '20px' }}>
+      <div className="card chart-card" style={{ padding: '20px' }}>
         <p className="skeleton skeleton-title" style={{ width: '60%' }}></p>
         <p className="skeleton skeleton-text" style={{ width: '40%', marginBottom: '24px' }}></p>
 
@@ -60,7 +60,7 @@ export default function DistributionPanel({ data, loading, area }) {
 
   if (!chartData || chartData.length === 0) {
     return (
-      <div className="card" style={{ padding: '24px' }}>
+      <div className="card chart-card" style={{ padding: '24px' }}>
         <p className="section-subtitle">Distribuição por Estrato</p>
         <div className="empty-state" style={{ padding: '48px 0' }}>
           <div className="empty-state-icon" style={{ color: 'var(--neutral-400)' }}>
@@ -75,7 +75,7 @@ export default function DistributionPanel({ data, loading, area }) {
   }
 
   return (
-    <div className="card animate-in" style={{ padding: '20px' }}>
+    <div className="card chart-card animate-in" style={{ padding: '20px' }}>
       <div style={{ marginBottom: '16px' }}>
         <h3 className="section-subtitle" style={{ marginBottom: '4px', color: 'var(--neutral-900)' }}>
           Distribuição de Qualidade
@@ -85,7 +85,7 @@ export default function DistributionPanel({ data, loading, area }) {
         </p>
       </div>
 
-      <div style={{ width: '100%', height: '220px' }}>
+      <div className="chart-container" style={{ width: '100%', height: '220px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie

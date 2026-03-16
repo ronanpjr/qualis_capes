@@ -8,7 +8,14 @@ export default function ChatPanel() {
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 480)
   const messagesEndRef = useRef(null)
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 480)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -28,17 +35,18 @@ export default function ChatPanel() {
     setLoading(true)
 
     try {
-      const res = await fetch('http://localhost:8000/api/chat', {
+      const BASE_URL = import.meta.env.VITE_API_URL
+      const res = await fetch(`${BASE_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userMessage })
       })
-      
+
       if (!res.ok) throw new Error('Erro na comunicação com o assistente')
-      
+
       const data = await res.json()
       setMessages(prev => [...prev, { role: 'assistant', text: data.response }])
-    } catch (error) {
+    } catch {
       setMessages(prev => [...prev, { role: 'assistant', text: 'Desculpe, ocorreu um erro ao consultar os dados. Tente novamente mais tarde.', isError: true }])
     } finally {
       setLoading(false)
@@ -50,10 +58,11 @@ export default function ChatPanel() {
       {/* Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
+        className="chat-toggle"
         style={{
           position: 'fixed',
-          bottom: '24px',
-          right: '24px',
+          bottom: isMobile ? '16px' : '24px',
+          right: isMobile ? '16px' : '24px',
           width: '56px',
           height: '56px',
           borderRadius: '28px',
@@ -85,11 +94,12 @@ export default function ChatPanel() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div style={{
+        <div className="chat-window" style={{
           position: 'fixed',
           bottom: '96px',
-          right: '24px',
-          width: '380px',
+          right: isMobile ? '16px' : '24px',
+          left: isMobile ? '16px' : 'auto',
+          width: isMobile ? 'auto' : '380px',
           height: '600px',
           maxHeight: 'calc(100vh - 120px)',
           background: 'var(--white)',
@@ -173,7 +183,7 @@ export default function ChatPanel() {
                 )}
               </div>
             ))}
-            
+
             {loading && (
               <div style={{
                 alignSelf: 'flex-start',
