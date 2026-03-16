@@ -4,6 +4,8 @@ Ferramenta para consultar e analisar classificações QUALIS de periódicos cien
 
 > **Dados:** Classificação de Periódicos — Quadriênio 2021-2024 (Plataforma Sucupira)
 
+*Nota: O enunciado mencionava a escala antiga (com B5), porém, para refletir fielmente a base de dados oficial do quadriênio 2021-2024 fornecida, o sistema foi adaptado para a escala atual (A1-A4, B1-B4, C).*
+
 ---
 
 ## 🏗️ Stack
@@ -29,28 +31,43 @@ Ferramenta para consultar e analisar classificações QUALIS de periódicos cien
 
 ## 🚀 Setup
 
-### 1. Clonar o repositório
+Você pode rodar o projeto inteiramente via Docker (Recomendado) ou manualmente.
+
+### Opção 1: Via Docker (Recomendado)
+
+A infraestrutura completa (Banco de Dados, Backend FastAPI e Frontend Vite) está configurada no `docker-compose`.
 
 ```bash
+# 1. Clone o repositório
 git clone <url-do-repositorio>
 cd agora_sabemos
-```
 
-### 2. Configurar variáveis de ambiente
-
-```bash
+# 2. Configure as variáveis de ambiente (necessário para a chave da Gemini API)
 cp .env.example .env
-# Editar .env com suas credenciais
+# Edite o arquivo .env e adicione sua GEMINI_API_KEY
+
+# 3. Suba todos os serviços
+docker compose up --build -d
+
+# 4. Popule o banco de dados com a planilha Excel fornecida
+docker compose exec backend python load_data.py
 ```
 
-### 3. Subir o banco de dados
+Acesse **http://localhost:5173** no navegador. O backend estará disponível em `http://localhost:8000`.
 
+---
+
+### Opção 2: Setup Manual
+
+Caso prefira rodar os serviços individualmente na sua máquina:
+
+#### 1. Banco de dados
+Suba apenas o banco de dados usando o docker-compose (ou use uma instância PostgreSQL local configurando o `.env`):
 ```bash
-docker compose up -d
+docker compose up -d postgres
 ```
 
-### 4. Backend
-
+#### 2. Backend
 ```bash
 cd backend
 python -m venv venv
@@ -64,8 +81,7 @@ python load_data.py
 uvicorn main:app --reload --port 8000
 ```
 
-### 5. Frontend
-
+#### 3. Frontend
 ```bash
 cd frontend
 npm install
@@ -100,6 +116,28 @@ SQLAlchemy é usado para definição de modelos e gerenciamento de sessão. **Qu
 
 ### Por que Gemini Function Calling?
 Ao invés de prompt engineering simples, usamos function calling — o modelo recebe as definições dos endpoints como ferramentas e decide qual executar baseado na intenção do usuário.
+
+---
+
+## 🧪 Testes Automatizados
+
+O projeto conta com uma suíte de testes unitários para a API (localizada em `backend/tests/`).
+Para rodá-los:
+
+```bash
+cd backend
+pytest -v
+```
+
+---
+
+## ⏳ O que eu faria diferente com mais tempo
+
+- **CI/CD Automatizado:** Criaria pipelines no GitHub Actions para rodar o linting, formatação e os testes (Pytest) automaticamente a cada pull request.
+- **Testes no Frontend:** Utilizaria o Vitest e a React Testing Library para adicionar cobertura de testes aos componentes React, e Cypress para testes end-to-end (E2E).
+- **Cache de Queries no Backend:** Integraria o Redis ou cache na memória (ex. `functools.lru_cache`) para as consultas de `/api/areas` e distribuições, uma vez que são dados de pouquíssima mutabilidade.
+- **Migrations:** Utilizaria o Alembic para versionamento do esquema de banco de dados, caso as tabelas ficassem mais complexas ao longo do tempo.
+- **Paginação Dinâmica e Melhorias de Busca:** Melhoraria a UX adicionando "infinite scroll" à tabela e implementando o Text Search do Postgres (com dicionários pt-br) ao longo de mais colunas para lidar com plurais e sinônimos.
 
 ---
 

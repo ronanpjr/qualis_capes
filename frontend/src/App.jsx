@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import './index.css'
-import { getAreas, getPeriodicos, getDistribuicao } from './api.js'
+import { useQualisData } from './hooks/useQualisData.js'
 import AreaSelector from './components/AreaSelector.jsx'
 import ClassificationFilter from './components/ClassificationFilter.jsx'
 import ResultsTable from './components/ResultsTable.jsx'
@@ -10,74 +10,19 @@ import ChatPanel from './components/ChatPanel.jsx'
 const PER_PAGE = 20
 
 export default function App() {
-  // --- Areas state ---
-  const [areas, setAreas] = useState([])
-  const [areasLoading, setAreasLoading] = useState(true)
+  const {
+    areas, areasLoading,
+    results, resultsLoading, resultsError,
+    distribution, distLoading,
+    fetchResults, fetchDistribution
+  } = useQualisData(PER_PAGE)
 
   // --- Selected area & filters ---
   const [selectedArea, setSelectedArea] = useState(null)
   const [selectedEstratos, setSelectedEstratos] = useState([])
   const [searchText, setSearchText] = useState('')
   const [searchInput, setSearchInput] = useState('') // local input state
-
-  // --- Results state ---
-  const [results, setResults] = useState(null)
-  const [resultsLoading, setResultsLoading] = useState(false)
-  const [resultsError, setResultsError] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
-
-  // --- Distribution state ---
-  const [distribution, setDistribution] = useState(null)
-  const [distLoading, setDistLoading] = useState(false)
-
-  // Load areas on mount
-  useEffect(() => {
-    getAreas()
-      .then(data => setAreas(data))
-      .catch(console.error)
-      .finally(() => setAreasLoading(false))
-  }, [])
-
-  // Fetch results when area/filters/page change
-  const fetchResults = useCallback(async (area, estratos, search, page) => {
-    if (!area) { setResults(null); return }
-    setResultsLoading(true)
-    setResultsError(null)
-    try {
-      const data = await getPeriodicos({
-        area,
-        // multiple estratos -> pass array of strings if supported by backend,
-        // but implementation plan says: GET /api/periodicos?area=&estrato=&search...
-        // so multiple might need custom handling.
-        // Let's pass array by comma-separating them, or just first one if only 1 is supported?
-        // Let's assume the backend supports comma separated or just 1.
-        estrato: estratos.length > 0 ? estratos.join(',') : undefined,
-        search: search || undefined,
-        page,
-        per_page: PER_PAGE,
-      })
-      setResults(data)
-    } catch (err) {
-      setResultsError(err.message)
-    } finally {
-      setResultsLoading(false)
-    }
-  }, [])
-
-  // Fetch distribution when area changes
-  const fetchDistribution = useCallback(async (area) => {
-    if (!area) { setDistribution(null); return }
-    setDistLoading(true)
-    try {
-      const data = await getDistribuicao(area)
-      // The API returns { area, total, distribuicao: [...] } — we only need the array
-      setDistribution(data.distribuicao ?? data)
-    } catch (err) {
-      console.error('Distribution error:', err)
-    } finally {
-      setDistLoading(false)
-    }
-  }, [])
 
   // React to area selection — resets all filters and fetches fresh data
   useEffect(() => {

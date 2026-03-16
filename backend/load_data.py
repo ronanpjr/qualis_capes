@@ -81,19 +81,20 @@ def insert_data(rows: list[tuple]):
     start = time.time()
     total_inserted = 0
 
-    for i in range(0, len(rows), BATCH_SIZE):
-        batch = rows[i : i + BATCH_SIZE]
-        cursor.executemany(
-            "INSERT INTO periodicos (issn, titulo, area, estrato) VALUES (%s, %s, %s, %s)",
-            batch,
-        )
-        raw_conn.commit()
-        total_inserted += len(batch)
-        elapsed = time.time() - start
-        print(f"  {total_inserted:,}/{len(rows):,} ({elapsed:.1f}s)", end="\r")
-
-    cursor.close()
-    raw_conn.close()
+    try:
+        for i in range(0, len(rows), BATCH_SIZE):
+            batch = rows[i : i + BATCH_SIZE]
+            cursor.executemany(
+                "INSERT INTO periodicos (issn, titulo, area, estrato) VALUES (%s, %s, %s, %s)",
+                batch,
+            )
+            raw_conn.commit()
+            total_inserted += len(batch)
+            elapsed = time.time() - start
+            print(f"  {total_inserted:,}/{len(rows):,} ({elapsed:.1f}s)", end="\r")
+    finally:
+        cursor.close()
+        raw_conn.close()
 
     elapsed = time.time() - start
     print(f"\n  ✓ {total_inserted:,} registros inseridos em {elapsed:.2f}s.")

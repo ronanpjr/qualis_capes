@@ -4,7 +4,11 @@ async function apiFetch(path, params = {}) {
   const url = new URL(`${BASE_URL}${path}`)
   Object.entries(params).forEach(([key, value]) => {
     if (value !== null && value !== undefined && value !== '') {
-      url.searchParams.set(key, value)
+      if (Array.isArray(value)) {
+        value.forEach(item => url.searchParams.append(key, item))
+      } else {
+        url.searchParams.set(key, value)
+      }
     }
   })
   const res = await fetch(url.toString())

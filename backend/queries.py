@@ -32,7 +32,7 @@ def get_areas(db: Session) -> list[str]:
 def search_periodicos(
     db: Session,
     area: Optional[str] = None,
-    estrato: Optional[str] = None,
+    estrato: Optional[list[str]] = None,
     search: Optional[str] = None,
     page: int = 1,
     per_page: int = 30,
@@ -55,7 +55,7 @@ def search_periodicos(
         params["area"] = area
 
     if estrato:
-        conditions.append("estrato = :estrato")
+        conditions.append("estrato = ANY(:estrato)")
         params["estrato"] = estrato
 
     if search:

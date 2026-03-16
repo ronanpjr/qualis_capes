@@ -124,7 +124,7 @@ def list_areas(request: Request, db: Session = Depends(get_db)):
 def search_periodicos(
     request: Request,
     area: str | None = Query(default=None, max_length=200),
-    estrato: str | None = Query(default=None),
+    estrato: list[str] | None = Query(default=None),
     search: str | None = Query(default=None, max_length=200, strip_whitespace=True),
     page: int = Query(default=1, ge=1),
     per_page: int = Query(default=30, ge=1, le=100),
@@ -138,11 +138,13 @@ def search_periodicos(
     - **page** / **per_page**: paginação (máx 100 por página)
     """
     # Valida estrato se fornecido
-    if estrato and estrato not in queries.VALID_ESTRATOS:
-        raise HTTPException(
-            status_code=422,
-            detail=f"Estrato inválido. Use: {', '.join(sorted(queries.VALID_ESTRATOS))}",
-        )
+    if estrato:
+        invalidos = [e for e in estrato if e not in queries.VALID_ESTRATOS]
+        if invalidos:
+            raise HTTPException(
+                status_code=422,
+                detail=f"Estratos inválidos: {', '.join(invalidos)}. Use: {', '.join(sorted(queries.VALID_ESTRATOS))}",
+            )
 
     items, total = queries.search_periodicos(
         db, area=area, estrato=estrato, search=search, page=page, per_page=per_page
