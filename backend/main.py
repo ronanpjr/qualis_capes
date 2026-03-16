@@ -26,6 +26,9 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 from sqlalchemy.orm import Session
+from typing import Annotated
+
+
 
 import queries
 from chat import handle_chat
@@ -111,7 +114,7 @@ async def add_security_headers(request: Request, call_next):
 
 @app.get("/api/areas", response_model=list[str], tags=["Áreas"])
 @limiter.limit("60/minute")
-def list_areas(request: Request, db: Session = Depends(get_db)):
+def list_areas(request: Request, db: Annotated[Session, Depends(get_db)]):
     """Lista todas as 50 áreas de avaliação disponíveis, ordenadas alfabeticamente."""
     areas = queries.get_areas(db)
     if not areas:
@@ -122,13 +125,13 @@ def list_areas(request: Request, db: Session = Depends(get_db)):
 @app.get("/api/periodicos", response_model=PaginatedResponse, tags=["Periódicos"])
 @limiter.limit("60/minute")
 def search_periodicos(
-    request: Request,
-    area: str | None = Query(default=None, max_length=200),
-    estrato: list[str] | None = Query(default=None),
-    search: str | None = Query(default=None, max_length=200, strip_whitespace=True),
-    page: int = Query(default=1, ge=1),
-    per_page: int = Query(default=30, ge=1, le=100),
-    db: Session = Depends(get_db),
+request: Request,
+    area: Annotated[str | None, Query(max_length=200)] = None,
+    estrato: Annotated[list[str] | None, Query()] = None,
+    search: Annotated[str | None, Query(max_length=200, strip_whitespace=True)] = None,
+    page: Annotated[int, Query(ge=1)] = 1,
+    per_page: Annotated[int, Query(ge=1, le=100)] = 30,
+    db: Annotated[Session, Depends(get_db)] = None,
 ):
     """
     Busca periódicos com filtros opcionais.
@@ -165,7 +168,7 @@ def search_periodicos(
     tags=["Áreas"],
 )
 @limiter.limit("60/minute")
-def get_distribuicao(request: Request, area: str, db: Session = Depends(get_db)):
+def get_distribuicao(request: Request, area: str, db: Annotated[Session, Depends(get_db)]):
     """
     Retorna a distribuição de estratos (contagem e percentual) para uma área específica.
     Ordenação semântica: A1 → C.
@@ -190,7 +193,7 @@ def get_distribuicao(request: Request, area: str, db: Session = Depends(get_db))
 async def chat(
     request: Request,
     body: ChatRequest,
-    db: Session = Depends(get_db),
+    db: Annotated[Session, Depends(get_db)],
 ):
     """
     Consulta em linguagem natural via Google Gemini (function calling).

@@ -101,6 +101,8 @@ Regras:
 - Se o usuário perguntar sobre uma área específica, use exatamente o nome da área como retornado por list_areas
 - Quando listar periódicos, mostre título, ISSN e estrato de forma organizada
 - Estratos de A1 (mais alto) a C (mais baixo)
+- Se o usuário perguntar sobre 'artigos', 'revistas' ou 'publicações', assuma que ele está se referindo a 'periódicos'
+- Para saber a quantidade total de periódicos em uma área, estrato ou de forma geral, use a função search_periodicos e verifique o valor de 'total' retornado
 """
 
 
@@ -172,18 +174,19 @@ async def handle_chat(message: str, db: Session) -> ChatResponse:
         # Executa a função
         result = _execute_function(fc.name, fc.args, db)
         
-        # Salva dados brutos se for a primeira/principal chamada
-        if raw_data is None:
-            if isinstance(result, list) and result:
-                # Se for lista de strings (list_areas), converte para list[dict]
-                if isinstance(result[0], str):
-                    raw_data = [{"area": a} for a in result]
-                else:
-                    # lista de dicts (get_distribuicao)
-                    raw_data = result
-            elif isinstance(result, dict):
-                # search_periodicos retorna {"items": [...], "total": N}
-                raw_data = result.get("items")
+        # Salva dados brutos da última chamada
+        if isinstance(result, list) and result:
+            # Se for lista de strings (list_areas), converte para list[dict]
+            if isinstance(result[0], str):
+                raw_data = [{"area": a} for a in result]
+            else:
+                # lista de dicts (get_distribuicao)
+                raw_data = result
+        elif isinstance(result, dict):
+            # search_periodicos retorna {"items": [...], "total": N}
+            raw_data = result.get("items")
+        else:
+            raw_data = [] # Fallback
             
         # --- Turno 2+: Envia resultado da função de volta para o Chat ---
         response = chat.send_message(

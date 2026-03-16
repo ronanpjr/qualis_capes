@@ -12,7 +12,7 @@ load_dotenv()
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://qualis_user:qualis_pass@localhost:5432/qualis_db",
+    "postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}",
 )
 
 engine = create_engine(

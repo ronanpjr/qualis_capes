@@ -458,6 +458,23 @@ input::placeholder {
   .content-grid {
     grid-template-columns: 1fr;
   }
-  .header-badge { display: none; }
+}
+
+@media (max-width: 640px) {
+  html {
+    font-size: 13px;
+  }
+  .app-container {
+    padding: 0 var(--sp-2);
+  }
+  .main-content {
+    padding: var(--sp-4) 0;
+  }
+  .card {
+    border-radius: var(--radius-md);
+  }
+  .header-inner {
+    padding: var(--sp-3);
+  }
 }
 
