@@ -116,10 +116,15 @@ def _execute_function(name: str, args: dict, db: Session) -> Any:
         return queries.get_areas(db)
 
     elif name == "search_periodicos":
+        # Converter estrato para lista se for string
+        estrato = args.get("estrato")
+        if isinstance(estrato, str):
+            estrato = [estrato]
+        
         items, total = queries.search_periodicos(
             db,
             area=args.get("area"),
-            estrato=args.get("estrato"),
+            estrato=estrato,
             search=args.get("search"),
             page=args.get("page", 1),
             per_page=min(args.get("per_page", 10), 50),  # cap de segurança

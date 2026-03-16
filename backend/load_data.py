@@ -67,34 +67,39 @@ def load_xlsx(xlsx_path: Path) -> list[tuple]:
 
 
 def insert_data(rows: list[tuple]):
-    """Inserção em batch usando raw connection para máxima performance."""
+    """Inserção em batch usando raw connection com transação atômica.
+
+    Técnica:
+    - engine.begin() cria uma transação automática com rollback em caso de erro
+    - Se qualquer INSERT falhar, TRUNCATE é revertido automaticamente
+    - Commits por batch (~5K registros) para balance entre segurança e performance
+    """
     print(f"▶ Inserindo {len(rows):,} registros em batches de {BATCH_SIZE:,}...")
-
-    # Limpa dados existentes para re-carga idempotente
-    with engine.connect() as conn:
-        conn.execute(text("TRUNCATE TABLE periodicos RESTART IDENTITY"))
-        conn.commit()
-
-    raw_conn = engine.raw_connection()
-    cursor = raw_conn.cursor()
 
     start = time.time()
     total_inserted = 0
 
-    try:
-        for i in range(0, len(rows), BATCH_SIZE):
-            batch = rows[i : i + BATCH_SIZE]
-            cursor.executemany(
-                "INSERT INTO periodicos (issn, titulo, area, estrato) VALUES (%s, %s, %s, %s)",
-                batch,
-            )
-            raw_conn.commit()
-            total_inserted += len(batch)
-            elapsed = time.time() - start
-            print(f"  {total_inserted:,}/{len(rows):,} ({elapsed:.1f}s)", end="\r")
-    finally:
-        cursor.close()
-        raw_conn.close()
+    # engine.begin() cria uma transação com rollback automático em caso de exceção
+    with engine.begin() as conn:
+        # Limpa dados existentes dentro da transação (para rollback atômico)
+        conn.execute(text("TRUNCATE TABLE periodicos RESTART IDENTITY"))
+
+        raw_conn = conn.connection.driver_connection
+        cursor = raw_conn.cursor()
+
+        try:
+            for i in range(0, len(rows), BATCH_SIZE):
+                batch = rows[i : i + BATCH_SIZE]
+                cursor.executemany(
+                    "INSERT INTO periodicos (issn, titulo, area, estrato) VALUES (%s, %s, %s, %s)",
+                    batch,
+                )
+                total_inserted += len(batch)
+                elapsed = time.time() - start
+                print(f"  {total_inserted:,}/{len(rows):,} ({elapsed:.1f}s)", end="\r")
+        finally:
+            cursor.close()
+            # Conexão será fechada automaticamente ao sair do contexto
 
     elapsed = time.time() - start
     print(f"\n  ✓ {total_inserted:,} registros inseridos em {elapsed:.2f}s.")
