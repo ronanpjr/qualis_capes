@@ -84,9 +84,11 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS — origens explícitas conforme SECURITY_GUIDELINES.md
+PROD_ORIGIN = os.getenv("PROD_ORIGIN")
 origins = [
     "http://localhost:5173",
     "http://localhost:3000",
+    f"{PROD_ORIGIN}",
 ]
 
 app.add_middleware(
