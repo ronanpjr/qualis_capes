@@ -136,11 +136,11 @@ async def add_security_headers(request: Request, call_next):
 def list_areas(request: Request, db: Annotated[Session, Depends(get_db)]):
     """Lista todas as 50 áreas de avaliação disponíveis, ordenadas alfabeticamente."""
     client_ip = request.client.host if request.client else "unknown"
-    logger.info(f"GET /api/areas from {client_ip}")
+    logger.info(f"GET /api/areas - client: {client_ip}")
     areas = queries.get_areas(db)
     if not areas:
         raise HTTPException(status_code=404, detail="Nenhuma área encontrada.")
-    logger.debug(f"Returned {len(areas)} areas")
+    logger.debug(f"/api/areas - response: {len(areas)} items")
     return areas
 
 
@@ -163,13 +163,13 @@ def search_periodicos(
     - **page** / **per_page**: paginação (máx 100 por página)
     """
     client_ip = request.client.host if request.client else "unknown"
-    logger.info(f"GET /api/periodicos from {client_ip} - area={area}, estrato={estrato}, search={search}, page={page}, per_page={per_page}")
+    logger.info(f"GET /api/periodicos - client: {client_ip}")
     
     # Valida área se fornecida
     if area:
         valid_areas = queries.get_areas(db)
         if area not in valid_areas:
-            logger.warning(f"Invalid area requested: {area}")
+            logger.warning(f"/api/periodicos - validation failed: invalid area")
             raise HTTPException(
                 status_code=422,
                 detail=f"Área '{area}' não existe. Áreas disponíveis: {', '.join(sorted(valid_areas)[:5])}...",
@@ -179,7 +179,7 @@ def search_periodicos(
     if estrato:
         invalidos = [e for e in estrato if e not in queries.VALID_ESTRATOS]
         if invalidos:
-            logger.warning(f"Invalid estratos requested: {invalidos}")
+            logger.warning(f"/api/periodicos - validation failed: invalid estrato")
             raise HTTPException(
                 status_code=422,
                 detail=f"Estratos inválidos: {', '.join(invalidos)}. Use: {', '.join(sorted(queries.VALID_ESTRATOS))}",
@@ -194,7 +194,7 @@ def search_periodicos(
         db, area=area, estrato=estrato, search=sanitized_search, page=page, per_page=per_page
     )
 
-    logger.debug(f"Returned {len(items)} periodicos, total={total}")
+    logger.debug(f"/api/periodicos - response: {len(items)} items, total: {total}")
     return PaginatedResponse(
         items=[PeriodicoResponse(**item) for item in items],
         total=total,
@@ -216,18 +216,18 @@ def get_distribuicao(request: Request, area: str, db: Annotated[Session, Depends
     Ordenação semântica: A1 → C.
     """
     client_ip = request.client.host if request.client else "unknown"
-    logger.info(f"GET /api/areas/{{area}}/distribuicao from {client_ip} - area={area}")
+    logger.info(f"GET /api/areas/{{area}}/distribuicao - client: {client_ip}")
     
     distribuicao = queries.get_distribuicao(db, area=area)
     if not distribuicao:
-        logger.warning(f"Area not found for distribuicao: {area}")
+        logger.warning(f"/api/areas/{{area}}/distribuicao - area not found")
         raise HTTPException(
             status_code=404,
             detail=f"Área '{area}' não encontrada ou sem dados.",
         )
 
     total = sum(item["count"] for item in distribuicao)
-    logger.debug(f"Distribuicao returned for {area}: total={total}")
+    logger.debug(f"/api/areas/{{area}}/distribuicao - response: total={total}")
     return DistribuicaoResponse(
         area=area,
         total=total,
@@ -248,15 +248,14 @@ async def chat(
     Rate-limited a 10 req/min por IP.
     """
     client_ip = request.client.host if request.client else "unknown"
-    message_preview = body.message[:50] + "..." if len(body.message) > 50 else body.message
-    logger.info(f"POST /api/chat from {client_ip} - message_preview={message_preview}")
+    logger.info(f"POST /api/chat - client: {client_ip}")
     
     try:
         result = await handle_chat(body.message, db)
-        logger.debug(f"Chat response action: {result.action_taken}")
+        logger.debug(f"/api/chat - response: action={result.action_taken}")
         return result
     except Exception as e:
-        logger.error(f"Error in chat handler: {str(e)}")
+        logger.error(f"/api/chat - handler error: {type(e).__name__}")
         raise HTTPException(status_code=503, detail="Serviço de IA temporariamente indisponível.")
 
 
