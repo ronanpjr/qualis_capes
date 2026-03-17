@@ -11,6 +11,7 @@ Ferramenta completa para consultar e analisar classificações **QUALIS CAPES** 
 
 > **Dados:** Classificação de Periódicos — Quadriênio 2021-2024 (Plataforma Sucupira)  
 > **Base:** 171.111 registros · 50 áreas de avaliação · Escalas: A1–A4, B1–B4, C
+
 ![Frontend (produção)](https://qualis-capes.vercel.app/)
 ![Documentação da API (produção)](https://capesqualis.duckdns.org/docs)
 
