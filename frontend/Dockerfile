@@ -1,4 +1,4 @@
-FROM node:18-alpine AS builder
+FROM node:22-alpine3.22 AS builder
 
 WORKDIR /app
 
@@ -6,6 +6,8 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
 RUN npm run build
 
 FROM nginx:alpine

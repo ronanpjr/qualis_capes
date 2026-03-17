@@ -343,7 +343,7 @@ GET /health
 - Type safety e autocomplete
 
 **Raw SQL Parametrizado:**
-- **Window Functions** (`COUNT(*) OVER()`) para paginação eficiente em 1 query vs 2
+- **LIMIT e OFFSET paramétricos** para paginação eficiente e de alta performance sobre 171K+ registros
 - **CASE WHEN** para ordenação semântica de estratos (A1 → C)
 - **ILIKE com índice pg_trgm** para busca textual rápida
 - **Proteção:** Parameterização via `:param` evita SQL injection
