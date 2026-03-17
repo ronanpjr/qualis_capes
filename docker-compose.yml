@@ -32,6 +32,9 @@ services:
       DB_HOST: postgres
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       PROD_ORIGIN: ${PROD_ORIGIN}
+      XLSX_PATH: /app/classificacoes_publicadas_sucupira_teste.xlsx
+    volumes:
+      - ./classificacoes_publicadas_sucupira_teste.xlsx:/app/classificacoes_publicadas_sucupira_teste.xlsx:ro
     depends_on:
       postgres:
         condition: service_healthy

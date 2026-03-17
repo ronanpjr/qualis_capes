@@ -1,7 +1,7 @@
 """
 Custom SQL queries — raw SQL via SQLAlchemy text() for performance-critical endpoints.
 This module demonstrates intentional use of SQL beyond ORM abstractions:
-  - Window functions (COUNT(*) OVER) for single-pass pagination
+  - Two-query pagination: COUNT(*) for total, SELECT with LIMIT/OFFSET for page data
   - CASE WHEN for semantic ordering of estratos
   - ILIKE for case-insensitive text search
   - Composite filter building with parameterized inputs (no interpolation)
@@ -46,7 +46,8 @@ def search_periodicos(
     - SQLAlchemy select().where() para construção dinâmica segura de queries
     - Proteção automática contra SQL injection via parameterização
     - ilike() para busca case-insensitive em título e ISSN
-    - Window function COUNT(*) OVER() para obter total sem query separada
+    - Duas queries separadas: COUNT(*) para o total + SELECT com LIMIT/OFFSET para a página
+      (mais eficiente que COUNT(*) OVER() que força scan completo antes do LIMIT)
     - LIMIT/OFFSET para paginação server-side
     """
     # Construir filtros dinamicamente usando Expression Language
@@ -56,6 +57,8 @@ def search_periodicos(
         filters.append(Periodico.area == area)
 
     if estrato:
+        if isinstance(estrato, str):
+            estrato = [estrato]
         filters.append(Periodico.estrato.in_(estrato))
 
     if search:
@@ -67,31 +70,29 @@ def search_periodicos(
             )
         )
 
-    # Construir query com Expression Language
-    # Usar window function para contar total em uma única query
-    total_count = func.count().over()
+    # Query 1: COUNT(*) — toca apenas o índice, não traz dados da página
+    count_stmt = select(func.count()).select_from(Periodico)
+    if filters:
+        count_stmt = count_stmt.where(and_(*filters))
+    total = db.execute(count_stmt).scalar() or 0
+
+    if total == 0:
+        return [], 0
+
+    # Query 2: busca somente a página solicitada após confirmar que há resultados
     stmt = select(
         Periodico.id,
         Periodico.issn,
         Periodico.titulo,
         Periodico.area,
         Periodico.estrato,
-        total_count.label("total_count")
     )
-
-    # Aplicar filtros usando and_(*filters) se houver filtros
     if filters:
         stmt = stmt.where(and_(*filters))
-
-    # Aplicar ordenação e paginação
     stmt = stmt.order_by(Periodico.titulo).limit(per_page).offset((page - 1) * per_page)
 
     rows = db.execute(stmt).mappings().fetchall()
 
-    if not rows:
-        return [], 0
-
-    total = rows[0]["total_count"]
     items = [
         {
             "id": row["id"],
