@@ -16,6 +16,9 @@ Ferramenta completa para consultar e analisar classificações **QUALIS CAPES** 
 
 *A interface foi projetada para ser intuitiva e responsiva, oferecendo busca global, filtros avançados, painel de distribuição com gráficos dinâmicos e chat com IA.*
 
+
+*Nota: O enunciado mencionava a escala antiga (com B5), porém, para refletir fielmente a base de dados oficial do quadriênio 2021-2024 fornecida, o sistema foi adaptado para a escala atual (A1-A4, B1-B4, C).*
+
 ## 📚 Índice
 
 - [Features](#-features)
