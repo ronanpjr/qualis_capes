@@ -13,6 +13,7 @@ Ferramenta completa para consultar e analisar classificações **QUALIS CAPES** 
 > **Base:** 171.111 registros · 50 áreas de avaliação · Escalas: A1–A4, B1–B4, C
 
 ![Frontend (produção)](https://qualis-capes.vercel.app/)
+
 ![Documentação da API (produção)](https://capesqualis.duckdns.org/docs)
 
 ![Interface do Sistema](docs/sonar_screenshots/interface.png)
