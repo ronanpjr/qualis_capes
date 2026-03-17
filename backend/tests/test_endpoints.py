@@ -50,7 +50,7 @@ class TestPeriodicosEndpoint:
         response = client.get("/api/periodicos?area=COMPUTAÇÃO")
         assert response.status_code == 200
         data = response.json()
-        assert data["total"] == 5
+        assert data["total"] == 6
         assert all(p["area"] == "COMPUTAÇÃO" for p in data["items"])
 
     def test_filter_by_estrato(self, client):
@@ -84,8 +84,7 @@ class TestPeriodicosEndpoint:
 
     def test_per_page_capped_at_100(self, client):
         response = client.get("/api/periodicos?per_page=999")
-        data = response.json()
-        assert data["per_page"] <= 100
+        assert response.status_code == 422
 
     def test_item_has_required_fields(self, client):
         data = client.get("/api/periodicos?per_page=1").json()
@@ -116,7 +115,7 @@ class TestDistribuicaoEndpoint:
 
     def test_distribuicao_total_is_correct(self, client):
         data = client.get("/api/areas/COMPUTAÇÃO/distribuicao").json()
-        assert data["total"] == 5
+        assert data["total"] == 6
 
     def test_distribuicao_percentuals_sum_100(self, client):
         data = client.get("/api/areas/COMPUTAÇÃO/distribuicao").json()
@@ -144,5 +143,5 @@ class TestChatEndpoint:
     def test_chat_without_api_key_returns_error(self, client, monkeypatch):
         monkeypatch.delenv("GEMINI_API_KEY", raising=False)
         response = client.post("/api/chat", json={"message": "Olá"})
-        # Deve retornar 500 (RuntimeError) ou 200 se não chamar Gemini
-        assert response.status_code in (200, 500)
+        # Deve retornar 503 (Serviço indisponível) ou 200 se não chamar Gemini
+        assert response.status_code in (200, 503)

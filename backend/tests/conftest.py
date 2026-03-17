@@ -10,6 +10,7 @@ skipados automaticamente no SQLite.
 import pytest
 from sqlalchemy import create_engine, text, event
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 from fastapi.testclient import TestClient
 
 import sys, os
@@ -32,15 +33,15 @@ def pytest_collection_modifyitems(config, items):
 # ---------------------------------------------------------------------------
 SEEDS = """
     INSERT INTO periodicos (issn, titulo, area, estrato) VALUES
-    ('0000-0001', 'Journal of Testing A1',      'COMPUTACAO', 'A1'),
-    ('0000-0002', 'Journal of Testing A2',      'COMPUTACAO', 'A2'),
-    ('0000-0003', 'Journal of Testing B1',      'COMPUTACAO', 'B1'),
-    ('0000-0004', 'Journal of Testing C',       'COMPUTACAO', 'C'),
+    ('0000-0001', 'Journal of Testing A1',      'COMPUTAÇÃO', 'A1'),
+    ('0000-0002', 'Journal of Testing A2',      'COMPUTAÇÃO', 'A2'),
+    ('0000-0003', 'Journal of Testing B1',      'COMPUTAÇÃO', 'B1'),
+    ('0000-0004', 'Journal of Testing C',       'COMPUTAÇÃO', 'C'),
     ('0000-0005', 'Revista Medica A1',          'MEDICINA I', 'A1'),
     ('0000-0006', 'Revista Medica A2',          'MEDICINA I', 'A2'),
     ('0000-0007', 'Advances in Engineering A1', 'ENGENHARIAS I', 'A1'),
-    ('0000-0008', 'Testing ISSN Search',        'COMPUTACAO', 'A3'),
-    ('1234-5678', 'ISSN Finder',                'COMPUTACAO', 'B2')
+    ('0000-0008', 'Testing ISSN Search',        'COMPUTAÇÃO', 'A3'),
+    ('1234-5678', 'ISSN Finder',                'COMPUTAÇÃO', 'B2')
 """
 
 
@@ -50,6 +51,7 @@ def db():
     engine = create_engine(
         "sqlite:///:memory:",
         connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
     )
     Base.metadata.create_all(bind=engine)
 

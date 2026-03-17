@@ -1,5 +1,76 @@
 import { useState, useEffect } from 'react'
 
+// Componente: Header de Resultados (reutilizável)
+function ResultsHeader({ total, page, totalPages, isMobileView }) {
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: '12px',
+    }}>
+      <span style={{ fontSize: '13px', color: 'var(--neutral-700)' }}>
+        <strong style={{ color: 'var(--neutral-900)' }}>{total.toLocaleString('pt-BR')}</strong> periódicos{!isMobileView ? ' encontrados' : ''}
+      </span>
+      <span style={{ fontSize: '12px', color: 'var(--neutral-400)' }}>
+        Página {page} de {totalPages}
+      </span>
+    </div>
+  )
+}
+
+// Componente: Controles de Paginação (reutilizável)
+function PaginationControls({ page, totalPages, onPageChange, isMobileView }) {
+  if (totalPages <= 1) return null
+
+  return (
+    <div className="pagination" style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '6px',
+      paddingTop: '20px',
+      flexWrap: isMobileView ? 'wrap' : 'nowrap'
+    }}>
+      <PageButton
+        onClick={() => onPageChange(1)}
+        disabled={page === 1}
+        title="Primeira"
+      >«</PageButton>
+
+      <PageButton
+        onClick={() => onPageChange(page - 1)}
+        disabled={page === 1}
+        title="Anterior"
+      >‹</PageButton>
+
+      {getPageNumbers(page, totalPages).map((p, i) =>
+        p === '...' ? (
+          <span key={`ellipsis-${i}`} style={{ padding: '0 4px', color: 'var(--neutral-400)' }}>…</span>
+        ) : (
+          <PageButton
+            key={p}
+            onClick={() => onPageChange(p)}
+            active={p === page}
+          >{p}</PageButton>
+        )
+      )}
+
+      <PageButton
+        onClick={() => onPageChange(page + 1)}
+        disabled={page === totalPages}
+        title="Próxima"
+      >›</PageButton>
+
+      <PageButton
+        onClick={() => onPageChange(totalPages)}
+        disabled={page === totalPages}
+        title="Última"
+      >»</PageButton>
+    </div>
+  )
+}
+
 export default function ResultsTable({ items, total, page, totalPages, loading, onPageChange }) {
   const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768)
 
@@ -68,19 +139,7 @@ export default function ResultsTable({ items, total, page, totalPages, loading, 
   if (isMobileView) {
     return (
       <div className="animate-in">
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: '12px',
-        }}>
-          <span style={{ fontSize: '13px', color: 'var(--neutral-700)' }}>
-            <strong style={{ color: 'var(--neutral-900)' }}>{total.toLocaleString('pt-BR')}</strong> periódicos
-          </span>
-          <span style={{ fontSize: '12px', color: 'var(--neutral-400)' }}>
-            Página {page} de {totalPages}
-          </span>
-        </div>
+        <ResultsHeader total={total} page={page} totalPages={totalPages} isMobileView={true} />
 
         {/* Mobile Card View */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -101,52 +160,7 @@ export default function ResultsTable({ items, total, page, totalPages, loading, 
           ))}
         </div>
 
-        {totalPages > 1 && (
-          <div className="pagination" style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '6px',
-            paddingTop: '20px',
-            flexWrap: 'wrap'
-          }}>
-            <PageButton
-              onClick={() => onPageChange(1)}
-              disabled={page === 1}
-              title="Primeira"
-            >«</PageButton>
-
-            <PageButton
-              onClick={() => onPageChange(page - 1)}
-              disabled={page === 1}
-              title="Anterior"
-            >‹</PageButton>
-
-            {getPageNumbers(page, totalPages).map((p, i) =>
-              p === '...' ? (
-                <span key={`ellipsis-${i}`} style={{ padding: '0 4px', color: 'var(--neutral-400)' }}>…</span>
-              ) : (
-                <PageButton
-                  key={p}
-                  onClick={() => onPageChange(p)}
-                  active={p === page}
-                >{p}</PageButton>
-              )
-            )}
-
-            <PageButton
-              onClick={() => onPageChange(page + 1)}
-              disabled={page === totalPages}
-              title="Próxima"
-            >›</PageButton>
-
-            <PageButton
-              onClick={() => onPageChange(totalPages)}
-              disabled={page === totalPages}
-              title="Última"
-            >»</PageButton>
-          </div>
-        )}
+        <PaginationControls page={page} totalPages={totalPages} onPageChange={onPageChange} isMobileView={true} />
       </div>
     )
   }
@@ -154,19 +168,7 @@ export default function ResultsTable({ items, total, page, totalPages, loading, 
   // Desktop Table View
   return (
     <div className="animate-in">
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: '12px',
-      }}>
-        <span style={{ fontSize: '13px', color: 'var(--neutral-700)' }}>
-          <strong style={{ color: 'var(--neutral-900)' }}>{total.toLocaleString('pt-BR')}</strong> periódicos encontrados
-        </span>
-        <span style={{ fontSize: '12px', color: 'var(--neutral-400)' }}>
-          Página {page} de {totalPages}
-        </span>
-      </div>
+      <ResultsHeader total={total} page={page} totalPages={totalPages} isMobileView={false} />
 
       <div style={{ overflowX: 'auto', borderRadius: 'var(--radius-md)', border: '1px solid var(--neutral-200)' }}>
         <table className="results-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
@@ -204,51 +206,7 @@ export default function ResultsTable({ items, total, page, totalPages, loading, 
         </table>
       </div>
 
-      {totalPages > 1 && (
-        <div className="pagination" style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '6px',
-          paddingTop: '20px',
-        }}>
-          <PageButton
-            onClick={() => onPageChange(1)}
-            disabled={page === 1}
-            title="Primeira"
-          >«</PageButton>
-
-          <PageButton
-            onClick={() => onPageChange(page - 1)}
-            disabled={page === 1}
-            title="Anterior"
-          >‹</PageButton>
-
-          {getPageNumbers(page, totalPages).map((p, i) =>
-            p === '...' ? (
-              <span key={`ellipsis-${i}`} style={{ padding: '0 4px', color: 'var(--neutral-400)' }}>…</span>
-            ) : (
-              <PageButton
-                key={p}
-                onClick={() => onPageChange(p)}
-                active={p === page}
-              >{p}</PageButton>
-            )
-          )}
-
-          <PageButton
-            onClick={() => onPageChange(page + 1)}
-            disabled={page === totalPages}
-            title="Próxima"
-          >›</PageButton>
-
-          <PageButton
-            onClick={() => onPageChange(totalPages)}
-            disabled={page === totalPages}
-            title="Última"
-          >»</PageButton>
-        </div>
-      )}
+      <PaginationControls page={page} totalPages={totalPages} onPageChange={onPageChange} isMobileView={false} />
     </div>
   )
 }

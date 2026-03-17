@@ -8,10 +8,14 @@ registros na tabela periodicos usando batch insert com psycopg2 diretamente
 Uso:
     cd backend
     source venv/bin/activate
-    python load_data.py [--xlsx ../classificacoes_publicadas_sucupira_teste.xlsx]
+    python load_data.py [--xlsx /caminho/para/arquivo.xlsx]
+
+Dentro do Docker, o arquivo é montado em /app/classificacoes_publicadas_sucupira_teste.xlsx
+como volume read-only e carregado automaticamente pelo entrypoint.sh quando o banco está vazio.
 """
 
 import argparse
+import os
 import sys
 import time
 from pathlib import Path
@@ -24,7 +28,7 @@ from models import Base
 
 
 BATCH_SIZE = 5_000
-DEFAULT_XLSX = Path(__file__).parent.parent / "classificacoes_publicadas_sucupira_teste.xlsx"
+DEFAULT_XLSX = Path(os.getenv("XLSX_PATH", str(Path(__file__).parent / "classificacoes_publicadas_sucupira_teste.xlsx")))
 
 
 def create_tables():

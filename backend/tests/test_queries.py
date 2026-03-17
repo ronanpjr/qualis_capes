@@ -39,7 +39,7 @@ class TestSearchPeriodicos:
 
     def test_filter_by_area(self, db):
         items, total = queries.search_periodicos(db, area="COMPUTAÇÃO")
-        assert total == 5
+        assert total == 6
         assert all(p["area"] == "COMPUTAÇÃO" for p in items)
 
     def test_filter_by_estrato(self, db):
@@ -103,7 +103,7 @@ class TestGetDistribuicao:
     def test_count_is_correct(self, db):
         result = queries.get_distribuicao(db, area="COMPUTAÇÃO")
         total = sum(r["count"] for r in result)
-        assert total == 5  # 5 periódicos na área COMPUTAÇÃO
+        assert total == 6  # 6 periódicos na área COMPUTAÇÃO
 
     def test_percentual_sums_to_100(self, db):
         result = queries.get_distribuicao(db, area="COMPUTAÇÃO")
