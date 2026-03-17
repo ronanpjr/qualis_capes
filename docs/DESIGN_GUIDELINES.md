@@ -12,7 +12,7 @@
 
 **Princípios:**
 1. **Dados em primeiro lugar** — a informação é a protagonista, não a interface
-2. **Sobriedade profissional** — sem efeitos chamativos, sem dark mode genérico
+2. **Sobriedade profissional** — sem efeitos chamativos
 3. **Hierarquia clara** — o olho deve saber exatamente para onde ir
 4. **Identidade acadêmica** — fontes, cores e layout que remetam ao ambiente universitário
 
@@ -164,6 +164,6 @@ Base: `4px`. Usar múltiplos: `8px`, `12px`, `16px`, `24px`, `32px`, `48px`.
 | Gradientes chamativos | Cores sólidas e sóbrias |
 | Neon / cores vibrantes | Paleta institucional azul |
 | Animações excessivas | Transições sutis (200ms) |
-| Fontes display/decorativas | Merriweather + Inter |
+| Fontes display/decorativas | Inter |
 | Border-radius > 12px | Cantos sutilmente arredondados |
 | Sombras pesadas | Sombras mínimas e suaves |

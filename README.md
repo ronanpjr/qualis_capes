@@ -354,7 +354,7 @@ result = db.execute(text("SELECT ... WHERE area = :area"), {"area": user_input})
 
 **Alternativas:**
 - ❌ Prompt engineering simples: Hallucinations, sem estrutura
-- ❌ RAG (Retrieval-Augmented): Complexo, não needed aqui
+- ❌ RAG (Retrieval-Augmented): Complexo, não haveria tempo de implementação aqui
 - ✅ Function Calling: O modelo recebe as **tool definitions** (endpoints como JSON) e decide qual chamar
 
 **Fluxo:**
@@ -676,21 +676,20 @@ docker compose up --build -d
 
 ## ⏳ Melhorias Futuras
 
-### Curto Prazo (1-2 semanas)
+### Curto Prazo 
 
 - [ ] **Testes E2E:** Cypress ou Playwright para fluxos completos
 - [ ] **Migrations:** Alembic para versionamento de schema
 - [ ] **Cache:** Redis ou `@lru_cache` para `/api/areas` (dados estáticos)
 - [ ] **Infinite Scroll:** Na tabela de resultados (vs paginação discreta)
 
-### Médio Prazo (1 mês)
-
+### Médio Prazo 
 - [ ] **CI/CD:** GitHub Actions para lint, test, deploy automático
 - [ ] **Full-Text Search avançado:** Dicionário português, sinônimos
 - [ ] **Export:** CSV/Excel dos resultados filtrados
 - [ ] **Analytics:** Dashboard de uso (queries mais comuns, áreas populares)
 
-### Longo Prazo (3+ meses)
+### Longo Prazo 
 
 - [ ] **Comparação entre áreas:** Gráficos de benchmark
 - [ ] **Histórico:** Tracking de mudanças de estrato ao longo dos anos
