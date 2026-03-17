@@ -173,21 +173,23 @@ async def scalar_html():
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# CORS — origens explícitas conforme SECURITY_GUIDELINES.md
 PROD_ORIGIN = os.getenv("PROD_ORIGIN")
 origins = [
     "http://localhost:5173",
     "http://localhost:3000",
 ]
 if PROD_ORIGIN:
-    origins.append(PROD_ORIGIN)
+    for o in PROD_ORIGIN.split(","):
+        cleaned_origin = o.strip().rstrip("/")
+        if cleaned_origin:
+            origins.append(cleaned_origin)
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=False,
-    allow_methods=["GET", "POST"],
-    allow_headers=["Content-Type"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
