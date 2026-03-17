@@ -477,7 +477,7 @@ def get_distribuicao(
 
 @app.post("/api/chat", response_model=ChatResponse, tags=["Chat"])
 @limiter.limit("10/minute")
-async def chat(
+def chat(
     request: Request,
     body: ChatRequest,
     db: Annotated[Session, Depends(get_db)],
@@ -577,7 +577,7 @@ async def chat(
     logger.info(f"POST /api/chat - client: {client_ip}")
     
     try:
-        result = await handle_chat(body.message, db)
+        result = handle_chat(body.message, db)
         logger.debug(f"/api/chat - response: action={result.action_taken}")
         return result
     except Exception as e:

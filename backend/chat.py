@@ -141,7 +141,7 @@ def _execute_function(name: str, args: dict, db: Session) -> Any:
 # Handler principal
 # ---------------------------------------------------------------------------
 
-async def handle_chat(message: str, db: Session) -> ChatResponse:
+def handle_chat(message: str, db: Session) -> ChatResponse:
     """
     Processa uma mensagem de linguagem natural usando Gemini Chat session.
     A sessão gerencia o histórico e as signatures (como thought_signature) automaticamente.
