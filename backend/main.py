@@ -177,7 +177,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 PROD_ORIGIN = os.getenv("PROD_ORIGIN")
 origins = [
     "http://localhost:5173",
-    "http://localhost:3000",
+    "https://qualis-capes.vercel.app",
 ]
 if PROD_ORIGIN:
     origins.append(PROD_ORIGIN)
